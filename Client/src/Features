@@ -1,0 +1,48 @@
+search
+    |- find people by name or username
+
+home page
+    |- navigation
+        |- create(+)
+        |- notification
+
+    |- top section(horizontal)
+        |- for you
+        |- trendings
+        |- news
+        |- sports
+        |- entertainment
+        |- based on user choice
+
+    |- middle
+        |- posts (lazy loading) based on content per page
+        
+
+filter
+    |- trending
+    |- 
+    |- people from anyone
+    |- people you follow
+    location
+    |- anywhere
+    |- near you
+
+user profile
+    |- name
+    |- username
+    |- followers
+    |- followings
+    |- join date
+    |- saved post
+    |- all Posts|
+            |- top section
+                |- useravatar, full name, username, uploade time in hours(h)
+            |- middle section
+                |- image/text
+            |- bottom section
+                        |- likes, share, save, comments, views
+settings
+    |- history
+    |- help center
+    |- theme light/dark
+
