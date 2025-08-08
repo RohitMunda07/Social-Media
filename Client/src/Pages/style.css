@@ -3,16 +3,16 @@
     grid-template-columns: 1fr auto;
 }
 
-.left_menu li{
+.left_menu li {
     cursor: pointer;
     padding: 0.5rem 1rem;
     border-radius: 10px;
 }
 
-.community h2{
+.community h2 {
     cursor: pointer;
 }
 
-.left_menu li:hover{
+.left_menu li:hover {
     background: #eae4e4;
 }

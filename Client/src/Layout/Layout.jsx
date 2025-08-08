@@ -1,15 +1,14 @@
 import React from 'react'
 import { Outlet } from 'react-router'
-import { Header, Home, SideBar } from '../index.js'
+import { ContentSection, Header, Home, SideBar } from '../index.js'
 
 export default function Layout() {
     return (
         <div>
             <Header />
-            <div className='flex'>
+            <div className='h-[90vh] flex w-full min-h-full'>
                 <SideBar />
-                <Home />
-                <Outlet />
+                <ContentSection />
             </div>
         </div>
     )

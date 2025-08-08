@@ -1,29 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
-import WhatshotIcon from '@mui/icons-material/Whatshot';
-import PublicIcon from '@mui/icons-material/Public';
-import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
-import MovieIcon from '@mui/icons-material/Movie';
-import StarIcon from '@mui/icons-material/Star';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const Categories = () => {
+  const [selected, setSelected] = useState("Overview");
+
   const items = [
-    { value: "For You" },
-    { value: "Trending" },
-    { value: "News" },
-    { value: "Sports" },
-    { value: "Entertainment" },
-  ]
+    { value: "Overview" },
+    { value: "Posts" },
+    { value: "Likes" },
+    { value: "Comments" },
+    { value: "Saved" },
+  ];
+
   return (
-    <div className='mt-5 flex gap-8 items-center justify-center'>
+    <div className='mt-5 flex gap-6 items-center justify-center'>
       {items.map((item) => (
-        <Button variant="contained" sx={{ borderRadius: '999px', mt: 3 }}>
+        <Button
+          key={item.value}
+          onClick={() => setSelected(item.value)}
+          sx={{
+            borderRadius: '999px',
+            mt: 3,
+            color: selected === item.value ? 'white' : 'black',
+            backgroundColor: selected === item.value ? 'rgba(0,0,0,0.6)' : 'transparent',
+            '&:hover': {
+              backgroundColor: selected === item.value ? 'dark' : 'rgba(0,0,0,0.08)'
+            }
+          }}
+        >
           {item.value}
         </Button>
       ))}
-
-
     </div>
   );
 };

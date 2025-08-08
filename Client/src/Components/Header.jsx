@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
@@ -33,6 +33,14 @@ export default function Header() {
     const handleMenuClose = () => {
         setAnchorEl(null);
     };
+    const handleNavigateToProfile = () => {
+        navigate('/user-profile')
+    }
+
+    const handleNavigateToSetting = () => {
+        navigate('/settings')
+    }
+    
 
     return (
         <div className='bg-[whitesmoke] px-20 py-4 flex items-center justify-between !w-full'>
@@ -90,7 +98,7 @@ export default function Header() {
                 >
                     <MenuItem onClick={handleMenuClose}>
                         <AccountCircleIcon fontSize="small" className='mr-2' />
-                        Profile
+                        <ListItemText onClick={handleNavigateToProfile}>Profile</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleMenuClose}>
                         <MenuItem>
@@ -103,7 +111,7 @@ export default function Header() {
                     </MenuItem>
                     <MenuItem onClick={handleMenuClose}>
                         <SettingsIcon fontSize="small" className='mr-2' />
-                        Settings
+                        <ListItemText onClick={handleNavigateToSetting}>Settings</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleMenuClose}>
                         <LogoutIcon fontSize="small" className='mr-2' />
