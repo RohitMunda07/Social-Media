@@ -11,10 +11,10 @@ export default function SideBar() {
     const [showCommunity, setShowCommunity] = useState(false);
     const [showRecent, setShowRecent] = useState(false);
     return (
-        <section className="min-h-full">
+        <section className="">
             {/* Left Section (Sticky Sidebar) */}
-            <div className='border-r-2 h-full text-start sticky top-0 w-52 bg-white p-4 overflow-y-auto'>
-                <ul className='left_menu space-y-2'>
+            <div className='border-r-2 h-full text-start fixed top-0 left-0 bottom-0 w-52 bg-white p-4'>
+                <ul className='left_menu space-y-2 mt-25'>
                     <li><HomeIcon className="mr-2" /> Home</li>
                     <li><PublicIcon className="mr-2" /> Explore</li>
                     <li><LocalFireDepartmentIcon className="mr-2" /> Trending</li>

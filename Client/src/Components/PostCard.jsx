@@ -54,10 +54,11 @@ const PostCard = () => {
                                     <Menu
                                         anchorEl={anchorEl}
                                         open={Boolean(anchorEl)}
+                                        disableScrollLock={true}
                                         onClose={() => setAnchorEl(null)}
                                     >
                                         <MenuItem onClick={() => { setAnchorEl(null); console.log("Hide post"); }}>
-                                            <NotInterestedIcon/> Hide Post
+                                            <NotInterestedIcon /> Hide Post
                                         </MenuItem>
                                         <MenuItem onClick={() => { setAnchorEl(null); console.log("Report post"); }}>
                                             <ReportGmailerrorredIcon /> Report Post

@@ -1,14 +1,15 @@
-import React from 'react'
-import { Outlet } from 'react-router'
-import { ContentSection, Header, Home, SideBar } from '../index.js'
+import { Outlet } from "react-router";
+import { Header, SideBar } from "../index.js";
 
 export default function Layout() {
     return (
-        <div>
+        <div className='min-h-screen'>
             <Header />
-            <div className='h-[90vh] flex w-full min-h-full'>
+            <div className='flex w-full items-center'>
                 <SideBar />
-                <ContentSection />
+                <main className='flex-1'>
+                    <Outlet /> {/* Move Outlet here instead of ContentSection */}
+                </main>
             </div>
         </div>
     )

@@ -8,6 +8,7 @@ import ContentSection from "./Components/ContentSection.jsx";
 import UserProfile from "./Pages/UserProfile.jsx";
 import NotificationMessage from "./Components/NotificationMessage.jsx";
 import Setting from "./Pages/Setting.jsx";
+import SignIn from "./Pages/SignIn.jsx";
 
 export {
     Header,
@@ -20,5 +21,6 @@ export {
     UserProfile,
     NotificationMessage,
     Setting,
+    SignIn,
     
 }

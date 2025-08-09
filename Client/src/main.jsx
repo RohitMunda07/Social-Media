@@ -4,7 +4,7 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter, Routes, Route, Router } from 'react-router'
 import Notification from './Pages/Notification.jsx'
-import { Home, Setting, UserProfile } from './index.js'
+import { Home, Setting, SignIn, UserProfile } from './index.js'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -15,6 +15,7 @@ createRoot(document.getElementById('root')).render(
           <Route path='/notifications' element={<Notification />} />
           <Route path='/user-profile' element={<UserProfile />} />
           <Route path='/settings' element={<Setting />} />
+          <Route path='/sign-in' element={<SignIn />} />
         </Route>
       </Routes>
     </StrictMode>
