@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useGoogleLogin, googleLogout } from '@react-oauth/google';
 import {
   Eye,
   EyeOff,
@@ -18,6 +19,20 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  const googleResponse = async (authResult) => {
+    try {
+      console.log(authResult);
+
+    } catch (error) {
+      console.error('Error while auth-code', error)
+    }
+  }
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: googleResponse,
+    onError: googleResponse,
+    flow: 'auth-code'
+  });
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -61,7 +76,8 @@ export default function SignIn() {
       <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         {/* Left Section */}
         <div className="hidden md:block">
-          <h1 className="text-4xl font-bold text-indigo-600">ConnectSphere</h1>
+          {/* <h1 className="text-4xl font-bold text-indigo-600">ConnectSphere</h1> */}
+          <img src="./logo.svg" alt="logo" className=' cursor-pointer w-[25rem] h-auto rounded-4xl' />
           <p className="text-lg text-gray-600 mt-2">
             Where connections come alive and stories unfold
           </p>
@@ -159,7 +175,7 @@ export default function SignIn() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
                 >
-                  {showPassword ? <EyeOff size={18} style={{cursor: "pointer"}} /> : <Eye size={18} style={{cursor: "pointer"}}  />}
+                  {showPassword ? <EyeOff size={18} style={{ cursor: "pointer" }} /> : <Eye size={18} style={{ cursor: "pointer" }} />}
                 </button>
               </div>
               {errors.password && (
@@ -203,6 +219,7 @@ export default function SignIn() {
               <button
                 type="button"
                 className="flex items-center justify-center gap-2 border rounded-lg py-2 hover:bg-gray-50"
+                onClick={googleLogin}
               >
                 {/* Google Icon */}
                 <svg width="20" height="20" viewBox="0 0 24 24">

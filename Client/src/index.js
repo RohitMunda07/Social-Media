@@ -9,6 +9,7 @@ import UserProfile from "./Pages/UserProfile.jsx";
 import NotificationMessage from "./Components/NotificationMessage.jsx";
 import Setting from "./Pages/Setting.jsx";
 import SignIn from "./Pages/SignIn.jsx";
+import NotFound from "./Pages/NotFound.jsx";
 
 export {
     Header,
@@ -22,5 +23,5 @@ export {
     NotificationMessage,
     Setting,
     SignIn,
-    
+    NotFound,
 }

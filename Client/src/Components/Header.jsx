@@ -49,7 +49,7 @@ export default function Header() {
             <div
                 onClick={() => navigate('/')}
             >
-                <img src="./logo.png" alt="logo" className=' cursor-pointer w-15 h-15 rounded-4xl' />
+                <img src="./logo.svg" alt="logo" className=' cursor-pointer w-[11.5rem] h-auto rounded-4xl' />
             </div>
 
             {/* search Bar */}
