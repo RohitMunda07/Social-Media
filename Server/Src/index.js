@@ -1,12 +1,34 @@
+import dotenv from 'dotenv'
 import express from 'express'
-const app = express()
-const PORT = process.env.PORT || 8080
+import { authRouter } from '../Routes/index.js'
+import connectDB from '../DataBase/index.js'
 
-app.get('/', (req, res) => {
-    res.send('Hello, Server this side')
+dotenv.config({
+    path: './env'
 })
 
-app.listen(PORT, () => {
-    console.log(`App is listening on PORT:${PORT}`);
 
-})
+connectDB();
+
+
+
+
+
+
+
+
+// const app = express()
+
+// const PORT = process.env.PORT || 8080
+
+
+// app.get('/', (req, res) => {
+//     res.send('Hello, Server this side')
+// })
+
+// app.use('/auth', authRouter)
+
+// app.listen(PORT, () => {
+//     console.log(`App is listening on PORT:${PORT}`);
+
+// })
