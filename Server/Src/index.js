@@ -2,13 +2,27 @@ import dotenv from 'dotenv'
 import express from 'express'
 import { authRouter } from '../Routes/index.js'
 import connectDB from '../DataBase/index.js'
+import { app } from './app.js'
 
 dotenv.config({
     path: './env'
 })
 
 
-connectDB();
+connectDB()
+    .then(() => {
+        app.on("error", (err) => {
+            console.log("Error before listening: ", err);
+            throw err;
+        })
+        
+        app.listen(process.env.PORT, () => {
+            console.log(`server is listening on PORT: ${process.env.PORT}`);
+        })
+    })
+    .catch((err) => {
+        console.log("Error connecting mongoDb: ", err);
+    })
 
 
 
