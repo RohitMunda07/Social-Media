@@ -14,9 +14,9 @@ dist-ssr
 *.local
 
 # Evironment variables
-*.env
 .env
-.env.*
+.env.test
+.env.production
 
 # Editor directories and files
 .vscode/*
