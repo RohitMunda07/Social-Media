@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Router } from 'react-router'
 import Notification from './Pages/Notification.jsx'
 import { Home, NotFound, Setting, SignIn, UserProfile } from './index.js'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import Testing from './Components/Testing.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')).render(
             <Route path='/user-profile' element={<UserProfile />} />
             <Route path='/settings' element={<Setting />} />
             <Route path='/sign-in' element={<SignIn />} />
+            <Route path='/testing' element={<Testing />} />
             <Route path='*' element={<NotFound />} />
           </Route>
         </Routes>
