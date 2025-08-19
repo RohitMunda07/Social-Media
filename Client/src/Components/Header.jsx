@@ -13,20 +13,28 @@ import Switch from '@mui/material/Switch';
 import { ListItemIcon, ListItemText } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import { useNavigate } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleAuthStatus } from '../Context/auth.slice.js';
 
 import './style.css';
 
 export default function Header() {
-    const navigate = useNavigate()
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [darkMode, setDarkMode] = useState(false);
+    const authStatus = useSelector((state) => state.auth.authStatus);
+    const dispatch = useDispatch();
+
+    const backToLogin = () => {
+        dispatch(toggleAuthStatus())
+        navigate('/sign-in')
+    }
 
     const handleThemeToggle = () => {
         setDarkMode(!darkMode);
         // OPTIONAL: Trigger actual theme switch logic here
     };
-    
+
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -41,6 +49,10 @@ export default function Header() {
     const handleNavigateToSetting = () => {
         navigate('/settings')
     }
+
+    useEffect(() => {
+        console.log("back to login page authStatus:", authStatus);
+    }, [authStatus])
 
 
     return (
@@ -65,7 +77,7 @@ export default function Header() {
             </div>
 
             {/* right section */}
-            {isLoggedIn ?
+            {authStatus ?
                 (<div className='flex items-center gap-5'>
                     {/* create */}
                     <div className='nav_right !px-2'>
@@ -117,8 +129,13 @@ export default function Header() {
                             <ListItemText onClick={handleNavigateToSetting}>Settings</ListItemText>
                         </MenuItem>
                         <MenuItem onClick={handleMenuClose}>
-                            <LogoutIcon fontSize="small" className='mr-2' />
+                            <LogoutIcon
+                                onClick={() => backToLogin}
+                                fontSize="small"
+                                className='mr-2'
+                            />
                             Logout
+                            {console.log(authStatus)}
                         </MenuItem>
                     </Menu>
                 </div>) : (

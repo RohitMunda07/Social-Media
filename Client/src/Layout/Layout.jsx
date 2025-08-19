@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import { Header, SideBar } from "../index.js";
+import { Header, SideBar, SignIn } from "../index.js";
 
 export default function Layout() {
     return (

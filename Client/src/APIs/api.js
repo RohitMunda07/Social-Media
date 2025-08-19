@@ -20,4 +20,8 @@ export const googleAuth = (code) => {
 
 export const post = async (route, formData, { headers }) => {
     return await app.post(`/${route}/`, formData, { headers })
+    // try {
+    // } catch (error) {
+    //     console.log("Error from Axios file", error);
+    // }
 }

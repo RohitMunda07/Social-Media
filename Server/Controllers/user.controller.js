@@ -11,6 +11,11 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new apiError(401, "Email and Password are required!")
     }
 
+    // check for data field is empty
+    if ([email, password].some((field) => field.trim() === "")) {
+        throw new apiError("Field can't be empty")
+    }
+
     // existancy check on database
     const existUser = await User.findOne({
         email: email
@@ -44,6 +49,36 @@ const registerUser = asyncHandler(async (req, res) => {
 })
 
 // login user
+const loginUser = asyncHandler(async (req, res) => {
+    // get user data
+    const { email, password } = req.body;
+
+    // validate the data
+    if (!email || !password) {
+        throw new apiError(403, "Email and Password is Required")
+    }
+
+    // check for data field is empty
+    if ([email, password].some((field) => field.trim() === "")) {
+        throw new apiError("Field can't be empty")
+    }
+
+    const existUser = await User.find({
+        email: email
+    })
+
+    if (!existUser) {
+        throw new apiError(404, `User with email ${email} Not found`);
+    }
+
+    return res.status(200).json(
+        new apiResponse(
+            201,
+            existUser,
+            "User Logged In Successfully"
+        )
+    )
+})
 
 // logout user
 
@@ -61,5 +96,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
 export {
-    registerUser
+    registerUser,
+    loginUser
 }
