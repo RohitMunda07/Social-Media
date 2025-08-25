@@ -3,12 +3,12 @@ import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const saveSchema = new Schema({
     savedBy: {
-        type: mongoose.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User"
     },
 
     savedPost: {
-        type: mongoose.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Post"
     },
 

@@ -10,9 +10,11 @@ import NotificationMessage from "./Components/NotificationMessage.jsx";
 import Setting from "./Pages/Setting.jsx";
 import SignIn from "./Pages/SignIn.jsx";
 import NotFound from "./Pages/NotFound.jsx";
+import SearchBar from "./Components/SearchBar.jsx";
 
 export {
     Header,
+    SearchBar,
     Navbar,
     Home,
     Categories,

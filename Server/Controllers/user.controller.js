@@ -83,7 +83,7 @@ const loginUser = asyncHandler(async (req, res) => {
 // logout user
 
 // search user based on username and fullname
-const searchDataOnDb = asyncHandler(async (req, res) => {
+const searchQuery = asyncHandler(async (req, res) => {
     // user's search data
     const { searchData = "" } = req.query
 
@@ -92,11 +92,14 @@ const searchDataOnDb = asyncHandler(async (req, res) => {
         throw new apiError(403, "Search field can't be empty")
     }
 
-    const findDataOnDb = await User.find({
-        searchData
+    const users = await User.find({
+        $or: [
+            { userName: { $regex: searchData, $options: "i" } },
+            { fullName: { $regex: searchData, $options: "i" } }
+        ]
     })
 
-    if (!findDataOnDb) {
+    if (!findDataOnDb || findDataOnDb.length === 0) {
         throw new apiError(404, `Search for ${searchData} not found`)
     }
 
@@ -125,5 +128,5 @@ const searchDataOnDb = asyncHandler(async (req, res) => {
 export {
     registerUser,
     loginUser,
-    searchDataOnDb
+    searchQuery
 }

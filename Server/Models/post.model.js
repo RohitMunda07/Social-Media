@@ -3,7 +3,7 @@ import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const postSchema = new Schema({
     owner: {
-        type: mongoose.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User'
     },
 
@@ -22,6 +22,11 @@ const postSchema = new Schema({
     isPublished: {
         type: Boolean,
         default: true
+    },
+
+    views: {
+        type: Number,
+        default: 0,
     }
 
 }, { timestamps: true })

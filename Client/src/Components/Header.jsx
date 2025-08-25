@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AddIcon from '@mui/icons-material/Add';
@@ -15,6 +14,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleAuthStatus } from '../Context/auth.slice.js';
+import SearchBar from './SearchBar.jsx';
 
 import './style.css';
 
@@ -65,16 +65,7 @@ export default function Header() {
             </div>
 
             {/* search Bar */}
-            <div className='space-x-8'>
-                <input
-                    type="text"
-                    className='border-2 border-black w-xl px-10 py-3 rounded-2xl'
-                    placeholder='Search'
-                />
-                <Button variant="contained" startIcon={<SearchIcon />}>
-                    Search
-                </Button>
-            </div>
+            <SearchBar />
 
             {/* right section */}
             {authStatus ?
