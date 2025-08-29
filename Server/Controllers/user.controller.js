@@ -82,6 +82,42 @@ const loginUser = asyncHandler(async (req, res) => {
 
 // logout user
 
+
+// update user Profile
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const { userName, fullName, email, phoneNumber, password, gender } = req.body;
+    if (userName || fullName || !email || !phoneNumber || password || gender) {
+        throw new apiError(403, "Fields are required")
+    }
+
+    if ([userName, fullName, email, phoneNumber, password, gender].some((field) => field.trim() === "")) {
+        throw new apiError(403, "Field can't be empty")
+    }
+
+    const updatedUser = await User.findOneAndUpdate({
+        userName,
+        fullName,
+        email,
+        password,
+        phoneNumber,
+        gender
+    })
+
+    if (!updatedUser) {
+        throw new apiError(500, "Error in updating details")
+    }
+
+    return res.send(200).json(
+        new apiResponse(
+            200,
+            updatedUser,
+            "Details updated Successfully"
+        )
+    )
+
+})
+// getUserProfile
+
 // search user based on username and fullname
 const searchQuery = asyncHandler(async (req, res) => {
     // user's search data
@@ -111,10 +147,6 @@ const searchQuery = asyncHandler(async (req, res) => {
         )
     )
 })
-
-// getUserProfile
-
-// update user Profile
 
 // update avatar
 

@@ -39,6 +39,10 @@ const userSchema = new Schema({
         trim: true
     },
 
+    phoneNumber:{
+        type: Number
+    },
+
     avatar: {
         type: String, // cloudinary string
     },

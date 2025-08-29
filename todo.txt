@@ -1,0 +1,13 @@
+fix auto log out when page is reloaded
+
+Email address
+p1235484@gmail.com
+
+Phone Number
+Password
+Gender
+
+Two-factor authentication
+
+Advanced
+Delete account
