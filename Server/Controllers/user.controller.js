@@ -2,6 +2,7 @@ import { asyncHandler } from '../utils/asynceHandler.js'
 import { User } from '../Models/user.model.js'
 import { apiError } from '../utils/errorHandler.js'
 import { apiResponse } from '../utils/responseHandler.js'
+import bcrypt from "bcrypt"
 
 //  register user
 const registerUser = asyncHandler(async (req, res) => {
@@ -34,15 +35,17 @@ const registerUser = asyncHandler(async (req, res) => {
         password
     })
 
-    if (!user) {
+    const isUser = await User.findById(user._id).select("-password -refreshToken")
+
+    if (!isUser) {
         throw new apiError(500, 'Error while creating user')
     }
-    console.log(`email is ${email}, password is ${password}`);
+    // console.log(`email is ${email}, password is ${password}`);
 
     return res.status(201).json(
         new apiResponse(
             201,
-            user,
+            isUser,
             'User Created SuccessFully'
         )
     )
@@ -51,30 +54,38 @@ const registerUser = asyncHandler(async (req, res) => {
 // login user
 const loginUser = asyncHandler(async (req, res) => {
     // get user data
-    const { email, password } = req.body;
+    const { email_UserName, password } = req.body;
 
     // validate the data
-    if (!email || !password) {
+    if (!email_UserName || !password) {
         throw new apiError(403, "Email and Password is Required")
     }
 
     // check for data field is empty
-    if ([email, password].some((field) => field.trim() === "")) {
+    if ([email_UserName, password].some((field) => field.trim() === "")) {
         throw new apiError("Field can't be empty")
     }
 
-    const existUser = await User.find({
-        email: email
+    const existUser = await User.findOne({
+        $or: [{ email: email_UserName }, { userName: email_UserName }]
     })
 
     if (!existUser) {
-        throw new apiError(404, `User with email ${email} Not found`);
+        throw new apiError(404, `User Not found`);
     }
+
+    const isValidPassword = await existUser.isPasswordCorrect(password);
+    // const isValidPassword = await bcrypt.compare(password, existUser.password);
+    if (!isValidPassword) {
+        throw new apiError(403, "Invalid Password")
+    }
+
+    const user = await User.findById(existUser._id).select("-password -refreshToken")
 
     return res.status(200).json(
         new apiResponse(
-            201,
-            existUser,
+            200,
+            user,
             "User Logged In Successfully"
         )
     )
