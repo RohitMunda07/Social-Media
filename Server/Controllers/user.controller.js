@@ -2,7 +2,26 @@ import { asyncHandler } from '../utils/asynceHandler.js'
 import { User } from '../Models/user.model.js'
 import { apiError } from '../utils/errorHandler.js'
 import { apiResponse } from '../utils/responseHandler.js'
-import bcrypt from "bcrypt"
+import jwt, { decode } from "jsonwebtoken"
+
+const generateAccessAndRefreshToken = async (userId) => {
+    try {
+        const user = await User.findById(userId);
+        if (!user) throw new Error("User not found");
+
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        // user.accessToken = accessToken;
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
+
+        return { accessToken, refreshToken }
+
+    } catch (error) {
+        throw new apiError(500, "Something went wrong while generating access and refresh token")
+    }
+}
 
 //  register user
 const registerUser = asyncHandler(async (req, res) => {
@@ -80,19 +99,109 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new apiError(403, "Invalid Password")
     }
 
-    const user = await User.findById(existUser._id).select("-password -refreshToken")
 
-    return res.status(200).json(
-        new apiResponse(
-            200,
-            user,
-            "User Logged In Successfully"
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(existUser._id);
+    console.log("after accessToken: ", accessToken);
+    console.log("after refreshToken: ", refreshToken);
+
+    const user = await User.findById(existUser._id)
+        .select("-password -refreshToken")
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    };
+
+    return res.status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new apiResponse(
+                200,
+                {
+                    user,
+                    accessToken,
+                    refreshToken
+                },
+                "User Logged In Successfully"
+            )
         )
-    )
 })
 
 // logout user
+const logoutUser = asyncHandler(async (req, res) => {
+    await User.findOneAndUpdate(
+        req.user._id,
+        {
+            $set: { accessToken: undefined }
+        },
+        {
+            new: true
+        }
+    )
 
+    const options = {
+        httpOnly: true,
+        secure: true
+    };
+
+    return res.status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(
+            new apiResponse(200, {}, "User Logout Successfully")
+        )
+})
+
+// update AccessToken
+const updateAccessToken = asyncHandler(async (req, res) => {
+    // get refresh token from user through cookies
+    const incommingRefreshToken = req.cookies?.refreshToken || req.body.refreshToken
+
+    // we need to update the token only when user's token is expired i.e no Access Token
+    if (!incommingRefreshToken) {
+        throw new apiError(401, "Unauthorized Request")
+    }
+
+    try {
+
+        // decode the refresh token
+        const decodedToken = jwt.verify(incommingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+
+        // find user by id present in decodedToken
+        const user = await User.findById(decodedToken?._id);
+
+        if (!user) {
+            throw new apiError(401, "Invalid Refresh Token to find user")
+        }
+
+        if (incommingRefreshToken !== user.refreshToken) {
+            throw new apiError(404, "refreshToken is expired")
+        }
+
+        const { accessToken, newRefreshToken } = await generateAccessAndRefreshToken(user?._id)
+
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
+            .json(
+                new apiResponse(
+                    200,
+                    { accessToken, refreshToken: newRefreshToken },
+                    "Access Token Updated Successfully"
+                )
+            )
+
+    } catch (error) {
+        throw new apiError(401, "Invalid Refresh Token", error?.message)
+    }
+})
 
 // update user Profile
 const updateUserProfile = asyncHandler(async (req, res) => {
@@ -171,5 +280,7 @@ const searchQuery = asyncHandler(async (req, res) => {
 export {
     registerUser,
     loginUser,
+    logoutUser,
+    updateAccessToken,
     searchQuery
 }
