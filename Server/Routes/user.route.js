@@ -3,9 +3,10 @@ import { verifyJWT } from "../Middleware/auth.middleware.js";
 import {
     registerUser,
     loginUser,
-    searchQuery,
+    // searchQuery,
     logoutUser,
-    updateAccessToken
+    updateAccessToken,
+    updateUserPassword
 } from "../Controllers/user.controller.js"
 
 const router = Router();
@@ -15,6 +16,7 @@ router.route("/login").post(loginUser)
 // secure routes
 router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/refresh-token").post(updateAccessToken)
-router.route("/search").get(searchQuery)
+router.route("/update-password").put(verifyJWT, updateUserPassword)
+// router.route("/search").get(searchQuery)
 
 export default router

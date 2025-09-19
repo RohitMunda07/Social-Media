@@ -3,6 +3,8 @@ import { User } from '../Models/user.model.js'
 import { apiError } from '../utils/errorHandler.js'
 import { apiResponse } from '../utils/responseHandler.js'
 import jwt, { decode } from "jsonwebtoken"
+import { use } from 'react'
+import { addChangeLog } from '../utils/addChangeLog.js'
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -203,6 +205,50 @@ const updateAccessToken = asyncHandler(async (req, res) => {
     }
 })
 
+const updateUserPassword = asyncHandler(async (req, res) => {
+    // get odd from user
+    const { oldPassword, newPassword } = req.body
+
+    // existance check
+    if (!oldPassword || !newPassword) {
+        throw new apiError(400, "Password fields are required")
+    }
+
+    // find the current user 
+    const user = await User.findById(req.user?._id)
+
+    if (!user) {
+        throw new apiError(404, "Unauthorized Request user not found")
+    }
+
+    // check the old password form database
+    const isOldPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+    if (!isOldPasswordCorrect) {
+        throw new apiError(403, "Old password is wrong")
+    }
+
+    if (oldPassword === newPassword) {
+        throw new apiError(403, "New Password can't be same as old")
+    }
+
+    // update the change history log
+    // addChangeLog(user, "Password", "****", "*****")
+
+    user.password = newPassword
+    await user.save({ validateBeforeSave: false })
+
+    return res
+        .status(200)
+        .json(
+            new apiResponse(
+                200,
+                user,
+                "Password Update Successfully"
+            )
+        )
+
+})
+
 // update user Profile
 const updateUserProfile = asyncHandler(async (req, res) => {
     const { userName, fullName, email, phoneNumber, password, gender } = req.body;
@@ -282,5 +328,5 @@ export {
     loginUser,
     logoutUser,
     updateAccessToken,
-    searchQuery
+    updateUserPassword,
 }

@@ -39,7 +39,7 @@ const userSchema = new Schema({
         trim: true
     },
 
-    phoneNumber:{
+    phoneNumber: {
         type: Number
     },
 
@@ -51,6 +51,15 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Post"
     },
+
+    changesHistory: [
+        {
+            field: { type: String, required: true },
+            oldValue: { type: String },
+            newValue: { type: String },
+            updatedAt: { type: Date, default: Date.now }
+        }
+    ],
 
     refreshToken: {
         type: String
@@ -99,5 +108,17 @@ userSchema.methods.generateRefreshToken = function () {
         }
     )
 }
+
+userSchema.set("toJSON", {
+    transform: function (doc, ret) {
+        if (ret.changesHistory) {
+            ret.changesHistory = ret.changesHistory.map(log => ({
+                ...log,
+                updatedAt: log.updatedAt.toString()
+            }));
+        }
+        return ret;
+    }
+});
 
 export const User = mongoose.model('User', userSchema)
