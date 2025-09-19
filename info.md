@@ -188,3 +188,11 @@ Here are some good starting points to **master creating such middleware**:
 ---
 
 Do you want me to **show you how this exact change-logging task would look with a Mongoose hook** (so you don’t even touch the controller), or do you want to stick with **Express middleware** for now?
+-------------------------------------------------------------------------------------
+
+``` js
+Schema-level safety
+
+Instead of manually deleting password/refreshToken everywhere, you can define them with select: false in your Mongoose schema.
+
+Then they won’t even show up unless you explicitly query them with .select("+password" ```

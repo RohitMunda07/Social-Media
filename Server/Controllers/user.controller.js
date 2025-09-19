@@ -3,7 +3,7 @@ import { User } from '../Models/user.model.js'
 import { apiError } from '../utils/errorHandler.js'
 import { apiResponse } from '../utils/responseHandler.js'
 import jwt, { decode } from "jsonwebtoken"
-import { use } from 'react'
+import { use, useDebugValue } from 'react'
 import { addChangeLog } from '../utils/addChangeLog.js'
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -205,6 +205,7 @@ const updateAccessToken = asyncHandler(async (req, res) => {
     }
 })
 
+// update user password
 const updateUserPassword = asyncHandler(async (req, res) => {
     // get odd from user
     const { oldPassword, newPassword } = req.body
@@ -251,37 +252,53 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 
 // update user Profile
 const updateUserProfile = asyncHandler(async (req, res) => {
-    const { userName, fullName, email, phoneNumber, password, gender } = req.body;
-    if (userName || fullName || !email || !phoneNumber || password || gender) {
-        throw new apiError(403, "Fields are required")
+    const allowedFields = ["userName", "fullName", "email", "phoneNumber", "gender"]
+    const userRequestFields = [];
+
+    // finding the user
+    const user = await User.findById(req.user?._id)
+    if (!user) {
+        throw new apiError(404, "User Not Found")
     }
 
-    if ([userName, fullName, email, phoneNumber, password, gender].some((field) => field.trim() === "")) {
-        throw new apiError(403, "Field can't be empty")
-    }
+    Object.keys(req.body).forEach((key) => {
+        // check is update possible
+        if (!allowedFields.includes(key)) {
+            throw new apiError(400, `${key} is not allowed to update`);
+        }
 
-    const updatedUser = await User.findOneAndUpdate({
-        userName,
-        fullName,
-        email,
-        password,
-        phoneNumber,
-        gender
+        // check if fields are empty
+        const field = req.body[key]
+        if (typeof field === "string" && field.trim() === "") {
+            throw new apiError(400, `${key} can't be empty`);
+        }
+
+        const oldValue = user[key] != null ? user[key].toString() : "";
+        user[key] = field;
+        const newValue = field != null ? field.toString() : "";
+
+        // add to change log
+        addChangeLog(user, key, oldValue, newValue);
     })
 
-    if (!updatedUser) {
-        throw new apiError(500, "Error in updating details")
-    }
+    await user.save({ validateBeforeSave: false })
 
-    return res.send(200).json(
-        new apiResponse(
-            200,
-            updatedUser,
-            "Details updated Successfully"
+    // omit sensitive data
+    const updatedUser = user.toObject();
+    delete updatedUser.password
+    delete updatedUser.refreshToken
+
+    return res
+        .status(200)
+        .json(
+            new apiResponse(
+                200,
+                updatedUser,
+                "Profile Updated Successfully"
+            )
         )
-    )
-
 })
+
 // getUserProfile
 
 // search user based on username and fullname
@@ -329,4 +346,5 @@ export {
     logoutUser,
     updateAccessToken,
     updateUserPassword,
+    updateUserProfile,
 }

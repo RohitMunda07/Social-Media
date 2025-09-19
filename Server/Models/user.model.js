@@ -40,7 +40,12 @@ const userSchema = new Schema({
     },
 
     phoneNumber: {
-        type: Number
+        type: Number,
+    },
+
+    gender: {
+        type: String,
+        default: "None"
     },
 
     avatar: {
