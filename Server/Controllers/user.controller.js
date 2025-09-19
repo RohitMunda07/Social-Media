@@ -299,6 +299,25 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         )
 })
 
+// get current user
+const getCurrentUser = asyncHandler(async (req, res) => {
+    // find the current user
+    const user = await User.findById(req.user?._id).select("-password -refreshToken -changesHistory")
+    if (!user) {
+        throw new apiError(404, "User Not Found")
+    }
+
+    return res
+        .status(200)
+        .json(
+            new apiResponse(
+                200,
+                user,
+                "Fetched Current User Successfully"
+            )
+        )
+})
+
 // getUserProfile
 
 // search user based on username and fullname
@@ -347,4 +366,5 @@ export {
     updateAccessToken,
     updateUserPassword,
     updateUserProfile,
+    getCurrentUser
 }
