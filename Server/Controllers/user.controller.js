@@ -387,6 +387,86 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
 })
 
+// get user channel
+const getUserchannelProfile = asyncHandler(async (req, res) => {
+    const { userName } = req.params
+
+    if (!userName) {
+        throw new apiError(400, "UserName is missing")
+    }
+
+    const channel = await User.aggregate([
+        {
+            $match: { userName: userName.toLowerCase() }
+        },
+        {
+            // Finding the Followers based on the channel as a common factor
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id", // since the same _id is been stored in the subsctiption model when user follows
+                foreignField: "channel",
+                as: "followers"
+            }
+        },
+        {
+            // Finding the channel based on the followers as a common factor
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "follower",
+                as: "channels"
+            }
+        },
+        {
+            $addFields: {
+                followersCount: {
+                    $size: "$followers"
+                },
+                subscribedToChannelCount: {
+                    $size: "$channels"
+                },
+                isCurrentUserFollowing: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$followers.follower"] },
+                        then: true,
+                        else: false,
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                userName: 1,
+                fullName: 1,
+                email: 1,
+                avatar: 1,
+                coverImage: 1,
+                followersCount: 1,
+                subscribedToChannelCount: 1,
+                isCurrentUserFollowing: 1,
+            }
+        }
+    ])
+
+    console.log("Channel: ", channel);
+
+    // what if the $match crashed so we new to check channel
+    // since aggregate returns an array
+    if (!channel?.length) {
+        throw new apiError(404, "channel does not exist")
+    }
+
+    return res
+        .status(200)
+        .json(
+            new apiResponse(
+                200,
+                channel[0],
+                "User Channel Fetched Successfully"
+            )
+        )
+})
+
 // getUserProfile
 
 // search user based on username and fullname
@@ -437,5 +517,6 @@ export {
     updateUserProfile,
     getCurrentUser,
     updateUserAvatar,
-    updateUserCoverImage
+    updateUserCoverImage,
+    getUserchannelProfile
 }
