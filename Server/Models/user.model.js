@@ -52,6 +52,10 @@ const userSchema = new Schema({
         type: String, // cloudinary string
     },
 
+    coverImage: {
+        type: String
+    },
+
     savedPost: {
         type: Schema.Types.ObjectId,
         ref: "Post"

@@ -11,10 +11,12 @@ cloudinary.config({
 const uploadOnCloudinary = async (localPath) => {
     try {
         if (!localPath) return null;
+        console.log("local file checked");
         const response = await cloudinary.uploader.upload(localPath, {
             resource_type: "auto"
         })
-        console.log("File Uploaded: ", response.url);
+        console.log("check after upload");
+        console.log("File Uploaded: ", response?.url || "Error getting URL");
         // unlink files after upload to cloudinary
         fs.unlinkSync(localPath)
         console.log("File Unlinked Successfully");
@@ -23,8 +25,8 @@ const uploadOnCloudinary = async (localPath) => {
         return response
 
     } catch (error) {
-        console.log("File upload failed");
-        fs.unlinkSync(localPath);
+        console.error("Cloudinary upload error: ", error);
+        if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
         return null;
     }
 

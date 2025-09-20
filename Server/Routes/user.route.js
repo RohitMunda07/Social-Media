@@ -8,8 +8,11 @@ import {
     updateAccessToken,
     updateUserPassword,
     updateUserProfile,
-    getCurrentUser
+    getCurrentUser,
+    updateUserCoverImage,
+    updateUserAvatar
 } from "../Controllers/user.controller.js"
+import { upload } from "../Middleware/multer.middleware.js";
 
 const router = Router();
 router.route("/register").post(registerUser)
@@ -21,6 +24,9 @@ router.route("/refresh-token").post(updateAccessToken)
 router.route("/update-password").put(verifyJWT, updateUserPassword)
 router.route("/update-user-profile").patch(verifyJWT, updateUserProfile)
 router.route("/get-current-user").get(verifyJWT, getCurrentUser)
+router.route("/update-avatar-image").patch(verifyJWT, upload.single('avatar'), updateUserAvatar)
+router.route("/update-cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage)
+
 // router.route("/search").get(searchQuery)
 
 export default router
