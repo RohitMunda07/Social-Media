@@ -6,6 +6,7 @@ import jwt, { decode } from "jsonwebtoken"
 import { use, useDebugValue } from 'react'
 import { addChangeLog } from '../utils/addChangeLog.js'
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
+import mongoose from 'mongoose'
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -461,8 +462,64 @@ const getUserchannelProfile = asyncHandler(async (req, res) => {
         .json(
             new apiResponse(
                 200,
-                channel[0],
+                channel[0], // array element at
                 "User Channel Fetched Successfully"
+            )
+        )
+})
+
+// get User History
+const getUserHistory = asyncHandler(async (req, res) => {
+    const user = await User.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user?._id)
+            }
+        },
+
+        {
+            $lookup: {
+                from: "videos",
+                localField: "_id",
+                foreignField: "owner",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "user",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner"
+                        }
+                    },
+                    {
+                        $project: {
+                            userName: 1,
+                            fullName: 1,
+                            avatar: 1,
+                        }
+                    },
+                    // setting up the first value of array
+                    {
+                        $addFields: {
+                            owner: {
+                                $first: "$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+
+    ])
+
+    return res
+        .status(200)
+        .json(
+            new apiResponse(
+                200,
+                user[0].watchHistory,
+                "Watch History Fetched Successfully"
             )
         )
 })
@@ -518,5 +575,6 @@ export {
     getCurrentUser,
     updateUserAvatar,
     updateUserCoverImage,
-    getUserchannelProfile
+    getUserchannelProfile,
+    getUserHistory
 }
