@@ -137,7 +137,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findOneAndUpdate(
         req.user._id,
         {
-            $set: { accessToken: undefined }
+            $unset: { accessToken: 1 }
         },
         {
             new: true
@@ -480,8 +480,8 @@ const getUserHistory = asyncHandler(async (req, res) => {
         {
             $lookup: {
                 from: "videos",
-                localField: "_id",
-                foreignField: "owner",
+                localField: "watchHistory",
+                foreignField: "_id",
                 as: "watchHistory",
                 pipeline: [
                     {
