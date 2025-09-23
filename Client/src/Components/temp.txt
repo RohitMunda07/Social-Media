@@ -1,0 +1,70 @@
+ {authStatus ?
+                (<div className='flex items-center gap-5'>
+                    {/* create */}
+                    <div className='nav_right !px-2'>
+                        <AddIcon /> Create
+                    </div>
+
+                    {/* notification */}
+                    <div className='nav_right'
+                        onClick={() => navigate('/notifications')}
+                    >
+                        <NotificationsNoneIcon />
+                    </div>
+
+                    {/* user profile with dropdown */}
+                    <div className='nav_right cursor-pointer' onClick={handleMenuOpen}>
+                        <img src="./man.png" alt="pic" className='w-8 h-8 rounded-full bg-gray-300' />
+                    </div>
+
+                    {/* Dropdown Menu */}
+                    <Menu
+                        anchorEl={anchorEl} // Position the menu relative to this element
+                        open={Boolean(anchorEl)} // Open only when anchorEl is not null
+                        onClose={handleMenuClose} // Close when clicking away or on item
+                        disableScrollLock={true}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                    >
+                        <MenuItem onClick={handleMenuClose}>
+                            <AccountCircleIcon fontSize="small" className='mr-2' />
+                            <ListItemText onClick={handleNavigateToProfile}>Profile</ListItemText>
+                        </MenuItem>
+                        <MenuItem onClick={handleMenuClose}>
+                            <MenuItem>
+                                <ListItemIcon>
+                                    <Brightness4Icon fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText>Dark Mode</ListItemText>
+                                <Switch checked={darkMode} onChange={handleThemeToggle} />
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem onClick={handleMenuClose}>
+                            <SettingsIcon fontSize="small" className='mr-2' />
+                            <ListItemText onClick={handleNavigateToSetting}>Settings</ListItemText>
+                        </MenuItem>
+                        <MenuItem onClick={handleMenuClose}>
+                            <LogoutIcon
+                                onClick={() => backToLogin}
+                                fontSize="small"
+                                className='mr-2'
+                            />
+                            Logout
+                            {console.log(authStatus)}
+                        </MenuItem>
+                    </Menu>
+                </div>) : (
+                    <Button
+                        onClick={() => navigate('/sign-in')}
+                        variant="contained"
+                        startIcon={<LoginIcon />}>
+                        Login
+                    </Button>
+                )
+            }

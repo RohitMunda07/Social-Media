@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import Button from '@mui/material/Button'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
@@ -12,13 +14,18 @@ import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 
 
 
-const PostCard = () => {
+const PostCard = ({ content = "", image = "", tags = [] || "" }) => {
     // const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
+    const [like, setLike] = useState(false)
+    const [bookmark, setBookMark] = useState(false)
+
 
     return (
-        <div className="py-4 w-full flex items-center flex-col h-[20rem] mx-auto mb-6">
-            <div className='bg-white border-t-1 border-b-1 p-2 max-w-2xl'>
+        <div className="py-4 w-full flex items-center flex-col mb-15 ">
+            <div className='bg-[whitesmoke] dark:text-white dark:bg-primary-dark px-8 py-8
+            rounded-3xl outline-0
+            '>
                 {/* Top: User Info + Content */}
                 <div className="flex items-start gap-4">
                     {/* Profile Pic */}
@@ -40,10 +47,10 @@ const PostCard = () => {
                                             fontSize: '0.75rem',
                                             height: '1.5rem',
                                             borderRadius: '99px',
-                                            padding: '0 10px'
+                                            padding: '2px 15px'
                                         }}
                                     >
-                                        join
+                                        follow
                                     </Button>
 
                                     {/* Dropdown Menu */}
@@ -68,29 +75,56 @@ const PostCard = () => {
                             </div>
                         </div>
 
-                        {/* Content Section with Read More */}
-                        <div className="relative h-[13rem] overflow-hidden bg-gray-100 px-3 py-2 rounded">
-                            <p className="text-start text-lg">
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Necessitatibus magni earum maxime ipsam deserunt nostrum quibusdam asperiores non, dolorum delectus quo totam rem fugit ab itaque nihil quaerat modi alias accusamus aliquid reiciendis aperiam atque sequi! Dolorum esse nostrum sequi sed iste est blanditiis tempore delectus minima! Culpa eaque nihil et repellat eum placeat quia fugit cupiditate molestiae. Facere repellendus provident illum sed velit maiores, perspiciatis totam ut eligendi dignissimos dolores at iusto dolor eum incidunt animi obcaecati asperiores. Eos cupiditate neque accusamus vitae rerum tenetur commodi error deserunt quos! Eius perspiciatis qui similique aperiam ex nostrum repudiandae fuga ab quasi, obcaecati quo, recusandae quibusdam deserunt quisquam maxime explicabo doloremque dolores molestiae neque autem doloribus a consequatur tempore iste. Recusandae aliquid tempore, eligendi quis ea voluptatibus nisi mollitia architecto explicabo, maxime nihil laboriosam doloribus qui vel commodi dolor modi distinctio ipsam nostrum eveniet facilis delectus aspernatur! Sit ex ea ratione iusto nemo eveniet deleniti, recusandae perspiciatis laborum illo molestiae assumenda quibusdam libero nisi! Magni totam, beatae, a error distinctio aliquid et perspiciatis ducimus deserunt ratione quam delectus eveniet consequatur minima ipsum dolor autem quae magnam vel est! Quisquam ut quae cum cumque ipsam sint, tenetur ullam fuga obcaecati necessitatibus officiis!
-                            </p>
-
-                        </div>
 
                     </div>
                 </div>
 
+                {/* Content Section with Read More */}
+                <div className="relative overflow-hidden bg-gray-100 py-10 rounded dark:text-white dark:bg-primary-dark">
+
+                    <p className="text-start text-lg">
+                        {content}
+                    </p>
+
+                    <div className='text-start pt-3 space-x-3'>
+                        {tags.map((tag) => (
+                            <span>{tag}</span>
+                        ))}
+                    </div>
+
+                    <div className='w-full h-full bg-amber-700 rounded-3xl mt-10'>
+                        <img src={image} alt="post-image"
+                            className='object-cover rounded-3xl'
+                        />
+                    </div>
+                </div>
+
                 {/* Icons */}
-                <div className="flex ml-[5rem] gap-6 mt-4">
-                    <div className="flex items-center gap-1 cursor-pointer hover:text-red-500">
-                        <FavoriteBorderIcon fontSize="small" />
-                        <span className="text-sm"></span>
+                <div className="flex justify-between px-10">
+                    <div className='flex gap-3'>
+                        <div className="flex items-center gap-1 ">
+                            <div className='cursor-pointer hover:text-red-500'
+                                onClick={() => setLike((prev) => !prev)}
+                            >
+                                {like ? <FavoriteIcon fontSize="medium" htmlColor='red' /> : <FavoriteBorderIcon fontSize="medium" />}
+
+                            </div>
+                            <span className="text-sm">10</span>
+                        </div>
+                        <div className="flex items-center gap-1 cursor-pointer">
+                            <div className='cursor-pointer hover:text-blue-500'>
+                                <ShareIcon fontSize="medium" />
+                            </div>
+                            <span className="text-sm">10</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-1 cursor-pointer hover:text-blue-500">
-                        <ShareIcon fontSize="small" />
-                        <span className="text-sm"></span>
-                    </div>
-                    <div className="flex items-center gap-1 cursor-pointer hover:text-yellow-600">
-                        <BookmarkBorderIcon fontSize="small" />
+
+                    <div className="flex items-center gap-1 cursor-pointer">
+                        <div className='cursor-pointer  hover:text-yellow-600'
+                            onClick={() => setBookMark((prev) => !prev)}
+                        >
+                            {bookmark ? <BookmarkIcon fontSize="medium" htmlColor='skyblue' /> : <BookmarkBorderIcon fontSize="medium" />}
+                        </div>
                         <span className="text-sm"></span>
                     </div>
                 </div>

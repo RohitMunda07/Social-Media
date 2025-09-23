@@ -9,6 +9,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import Testing from './Components/Testing.jsx';
 import { Provider } from 'react-redux';   
 import { store } from './Context/store.js';
+import Layout from './Layout/Layout.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/" element={<App />}>
               <Route index element={<Home />} />
               <Route path="/notifications" element={<Notification />} />
+              <Route path="/layout" element={<Layout/>} />
               <Route path="/user-profile" element={<UserProfile />} />
               <Route path="/settings" element={<Setting />} />
               <Route path="/sign-in" element={<SignIn />} />

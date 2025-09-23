@@ -28,12 +28,13 @@ function SearchBar() {
     }
 
     return (
-        <form className='space-x-8' onSubmit={handOnSubmit}>
+        <form className='space-x-8 md:flex hidden' onSubmit={handOnSubmit}>
             <input
+                id='searchBar'
                 type="text"
                 value={searchData}
                 onChange={handleOnChange}
-                className='border-2 border-black w-xl px-10 py-3 rounded-2xl'
+                className='border-2 outline-0 border-black dark:border-white px-5 rounded-2xl'
                 placeholder='Search'
             />
             <Button
