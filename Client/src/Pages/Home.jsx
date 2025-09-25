@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Categories, PostCard } from '../index.js';
+import { Categories, PostCard, SideBar } from '../index.js';
 
 import './style.css';
 
@@ -20,7 +20,12 @@ export default function Home() {
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/design-system-ui-components-colorful-ar6FRPYNIa555QL0nXsJcihz9Zmn4x.jpg"
     ]
     return (
-        <div className='mx-auto w-full min-h-screen dark:text-white dark:bg-primary-dark'>
+        <div id='grid-container' className='mx-auto w-full min-h-screen dark:text-white dark:bg-primary-dark'>
+
+            <div>
+                <SideBar />
+            </div>
+
             {/* Right Section (Main Content Area) */}
             <div className='flex w-full min-h-[100vh] flex-col'>
                 <PostCard content={content[0]} image={image[0]} tags={tags[0]} />

@@ -41,9 +41,9 @@ const PostCard = ({ content = "", image = "", tags = [] || "" }) => {
                                 <h2>rohit418 <span className='text-xs'>1h</span></h2>
 
                                 <div className='flex items-center gap-2'>
-                                    <Button
-                                        variant="contained"
-                                        sx={{
+                                    <button
+                                    className='bg-blue-600 text-white'
+                                        style={{
                                             fontSize: '0.75rem',
                                             height: '1.5rem',
                                             borderRadius: '99px',
@@ -51,7 +51,8 @@ const PostCard = ({ content = "", image = "", tags = [] || "" }) => {
                                         }}
                                     >
                                         follow
-                                    </Button>
+                                    </button>
+
 
                                     {/* Dropdown Menu */}
                                     <MoreVertIcon
@@ -80,7 +81,7 @@ const PostCard = ({ content = "", image = "", tags = [] || "" }) => {
                 </div>
 
                 {/* Content Section with Read More */}
-                <div className="relative overflow-hidden bg-gray-100 py-10 rounded dark:text-white dark:bg-primary-dark">
+                <div className="overflow-hidden bg-gray-100 py-10 rounded dark:text-white dark:bg-primary-dark">
 
                     <p className="text-start text-lg">
                         {content}

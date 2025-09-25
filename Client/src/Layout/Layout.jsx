@@ -5,10 +5,10 @@ export default function Layout() {
     return (
         <div className='min-h-screen'>
             <Header />
-            <div id="grid-container" className='container mx-auto w-full !min-h-screen '>
-                <aside className="sticky top-0 left-0">
+            <div id="" className='container mx-auto w-full !min-h-screen'>
+                {/* <aside className="sticky top-0 left-0 place-items-start md:place-items-stretch">
                     <SideBar />
-                </aside>
+                </aside> */}
                 <main className="!text-black px-5 py-3">
                    <Outlet />
                 </main>
