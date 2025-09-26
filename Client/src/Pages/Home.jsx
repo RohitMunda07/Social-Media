@@ -28,14 +28,14 @@ export default function Home() {
 
             {/* Right Section (Main Content Area) */}
             <div className='flex w-full min-h-[100vh] flex-col'>
-                <PostCard content={content[0]} image={image[0]} tags={tags[0]} />
-                <PostCard content={content[1]} image={image[1]} tags={tags[1]} />
-                <PostCard content={content[0]} image={image[0]} tags={tags[0]} />
-                <PostCard content={content[1]} image={image[1]} tags={tags[1]} />
-                <PostCard content={content[0]} image={image[0]} tags={tags[0]} />
-                <PostCard content={content[1]} image={image[1]} tags={tags[1]} />
-                <PostCard content={content[0]} image={image[0]} tags={tags[0]} />
-                <PostCard content={content[1]} image={image[1]} tags={tags[1]} />
+                <PostCard content={content[0]} image={image[0]} tags={tags[0]} hideFollowBtn={false}/>
+                <PostCard content={content[1]} image={image[1]} tags={tags[1]} hideFollowBtn={false}/>
+                <PostCard content={content[0]} image={image[0]} tags={tags[0]} hideFollowBtn={false}/>
+                <PostCard content={content[1]} image={image[1]} tags={tags[1]} hideFollowBtn={false}/>
+                <PostCard content={content[0]} image={image[0]} tags={tags[0]} hideFollowBtn={false}/>
+                <PostCard content={content[1]} image={image[1]} tags={tags[1]} hideFollowBtn={false}/>
+                <PostCard content={content[0]} image={image[0]} tags={tags[0]} hideFollowBtn={false}/>
+                <PostCard content={content[1]} image={image[1]} tags={tags[1]} hideFollowBtn={false}/>
             </div>
 
         </div>

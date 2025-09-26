@@ -14,7 +14,7 @@ import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 
 
 
-const PostCard = ({ content = "", image = "", tags = [] || "" }) => {
+const PostCard = ({ content = "", image = "", tags = [] || "", hideFollowBtn = {} }) => {
     // const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [like, setLike] = useState(false)
@@ -22,7 +22,8 @@ const PostCard = ({ content = "", image = "", tags = [] || "" }) => {
 
 
     return (
-        <div className="py-4 w-full flex items-center flex-col mb-15 ">
+        <div className="py-4 w-full flex items-center flex-col ">
+
             <div className='bg-[whitesmoke] dark:text-white dark:bg-primary-dark px-8 py-8
             rounded-3xl outline-0
             '>
@@ -42,13 +43,14 @@ const PostCard = ({ content = "", image = "", tags = [] || "" }) => {
 
                                 <div className='flex items-center gap-2'>
                                     <button
-                                    className='bg-blue-600 text-white'
+                                        className={`bg-blue-600 text-white ${hideFollowBtn ? "hidden" : ""}`}
                                         style={{
                                             fontSize: '0.75rem',
                                             height: '1.5rem',
                                             borderRadius: '99px',
                                             padding: '2px 15px'
                                         }}
+
                                     >
                                         follow
                                     </button>
@@ -81,7 +83,7 @@ const PostCard = ({ content = "", image = "", tags = [] || "" }) => {
                 </div>
 
                 {/* Content Section with Read More */}
-                <div className="overflow-hidden bg-gray-100 py-10 rounded dark:text-white dark:bg-primary-dark">
+                <div className="overflow-hidden bg-gray-100 py-8 rounded dark:text-white dark:bg-primary-dark">
 
                     <p className="text-start text-lg">
                         {content}

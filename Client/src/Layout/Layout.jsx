@@ -5,12 +5,12 @@ export default function Layout() {
     return (
         <div className='min-h-screen'>
             <Header />
-            <div id="" className='container mx-auto w-full !min-h-screen'>
+            <div id="" className='container mx-auto w-full '> {/* min-h-screen */}
                 {/* <aside className="sticky top-0 left-0 place-items-start md:place-items-stretch">
                     <SideBar />
                 </aside> */}
                 <main className="!text-black px-5 py-3">
-                   <Outlet />
+                    <Outlet />
                 </main>
                 {/* <aside className="bg-amber-400">
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi saepe vero quod inventore cum ratione provident maiores vel esse. Aut doloremque dicta omnis nam at, itaque ratione totam vitae sapiente?

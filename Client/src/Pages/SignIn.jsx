@@ -45,6 +45,7 @@ export default function SignIn() {
     onError: (err) => console.log("Google Login Failed", err),
     flow: 'auth-code'
   });
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -107,7 +108,7 @@ export default function SignIn() {
   }, [authStatus]);
 
   return (
-    <div className="min-h-screen ml-50 flex items-center justify-center bg-indigo-50 pt-14">
+    <div className="flex items-center justify-center bg-indigo-50 pt-14 rounded-3xl ">
       <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         {/* Left Section */}
         <div className="hidden md:block">

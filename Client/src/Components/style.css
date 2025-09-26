@@ -2,7 +2,8 @@ body {
     overflow-x: hidden;
 }
 
-li, button {
+li,
+button {
     cursor: pointer;
 }
 
@@ -58,6 +59,20 @@ li, button {
     top: 6%;
 }
 
+.active-tab {
+    background: rgb(255, 251, 251);
+}
+
+#profile-tabs li {
+    padding: 2px 15px;
+    border-radius: 9px;
+}
+
+#profile-contents {
+    display: grid;
+    grid-template-columns: 1;
+}
+
 @media (min-width: 760px) {
     #grid-container {
         display: grid;
@@ -73,5 +88,9 @@ li, button {
     #menuIcon,
     #sideMenu {
         display: none;
+    }
+
+    #profile-contents {
+        grid-template-columns: 1fr 1fr;
     }
 }
