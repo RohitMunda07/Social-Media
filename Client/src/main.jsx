@@ -10,6 +10,7 @@ import Testing from './Components/Testing.jsx';
 import { Provider } from 'react-redux';   
 import { store } from './Context/store.js';
 import Layout from './Layout/Layout.jsx';
+import CreatePost from './Pages/CreatePost.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -24,6 +25,7 @@ createRoot(document.getElementById('root')).render(
               <Route path="/user-profile" element={<UserProfile />} />
               <Route path="/settings" element={<Setting />} />
               <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/create-post" element={<CreatePost />} />
               <Route path="/testing" element={<Testing />} />
               <Route path="*" element={<NotFound />} />
             </Route>

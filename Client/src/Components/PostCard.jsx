@@ -86,19 +86,22 @@ const PostCard = ({ content = "", image = "", tags = [] || "", hideFollowBtn = {
                 <div className="overflow-hidden bg-gray-100 py-8 rounded dark:text-white dark:bg-primary-dark">
 
                     <p className="text-start text-lg">
-                        {content}
+                        {content.length > 0 && (content)}
                     </p>
 
                     <div className='text-start pt-3 space-x-3'>
-                        {tags.map((tag) => (
-                            <span>{tag}</span>
-                        ))}
+                        {tags.length > 0 &&
+                            (tags.map((tag) => (
+                                <span key={tag}>{tag}</span>
+                            )))
+                        }
                     </div>
 
-                    <div className='w-full h-full bg-amber-700 rounded-3xl mt-10'>
-                        <img src={image} alt="post-image"
+                    <div className='w-full h-full rounded-3xl mt-10'>
+                        {image.length > 0 && (<img src={image} alt="post-image"
                             className='object-cover rounded-3xl'
-                        />
+                        />)
+                        }
                     </div>
                 </div>
 
