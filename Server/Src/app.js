@@ -1,8 +1,9 @@
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import userRouter from '../Routes/user.route.js'
 import { errorMiddleware } from '../Middleware/error.middleware.js';
+import userRouter from '../Routes/user.route.js'
+import postRoute from '../Routes/post.router.js'
 
 const app = express();
 
@@ -21,7 +22,11 @@ app.get('/api/v1/test', (req, res) => {
     res.send("Testing123")
 })
 
+// user route
 app.use("/api/v1/users", userRouter)
+
+// post route
+app.use("/api/v1/post", postRoute)
 
 app.use(errorMiddleware);
 

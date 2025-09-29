@@ -24,6 +24,8 @@ const postSchema = new Schema({
         default: true
     },
 
+    images: [],
+
     views: {
         type: Number,
         default: 0,

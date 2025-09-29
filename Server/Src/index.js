@@ -15,7 +15,7 @@ connectDB()
             console.log("Error before listening: ", err);
             throw err;
         })
-        
+
         app.listen(process.env.PORT, () => {
             console.log(`server is listening on PORT: ${process.env.PORT}`);
         })
