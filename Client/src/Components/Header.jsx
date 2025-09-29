@@ -13,11 +13,12 @@ import { ListItemIcon, ListItemText } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleAuthStatus } from '../Context/auth.slice.js';
+import { toggleAuthStatus, setAuthStatus } from '../Context/auth.slice.js';
 import SearchBar from './SearchBar.jsx';
 
 import './style.css';
 import DarkModeToggle from './DarkModeToggle.jsx';
+import { post } from '../APIs/api.js';
 
 export default function Header() {
     const navigate = useNavigate();
@@ -25,9 +26,19 @@ export default function Header() {
     const authStatus = useSelector((state) => state.auth.authStatus);
     const dispatch = useDispatch();
 
-    const backToLogin = () => {
-        dispatch(toggleAuthStatus())
-        navigate('/sign-in')
+    const backToLogin = async () => {
+        handleMenuClose()
+        dispatch(setAuthStatus(false))
+        localStorage.setItem("auth", "false")
+        try {
+            const res = await post("users/logout", {}, {})
+            console.log("auth status:", authStatus);
+            console.log("Logout response:", res.data);
+            navigate('/sign-in')
+
+        } catch (error) {
+            console.log("Something went wrong");
+        }
     }
 
     const handleMenuOpen = (event) => {
@@ -67,7 +78,9 @@ export default function Header() {
                 {authStatus ?
                     (<div className='flex items-center leading-0 mr-2 gap-x-1.5'>
                         {/* create */}
-                        <div className='nav_right !px-2'>
+                        <div className='nav_right !px-2'
+                            onClick={() => navigate('/create-post')}
+                        >
                             <AddIcon /> Create
                         </div>
 
@@ -99,19 +112,25 @@ export default function Header() {
                             }}
                         >
                             <MenuItem onClick={handleMenuClose}>
-                                <AccountCircleIcon fontSize="small" className='mr-2' />
-                                <ListItemText onClick={handleNavigateToProfile}>Profile</ListItemText>
+                                <span onClick={handleNavigateToProfile}>
+                                    <AccountCircleIcon fontSize="small" className='mr-2' />
+                                    Profile
+                                </span>
                             </MenuItem>
+
                             <MenuItem onClick={handleMenuClose}>
                                 <DarkModeToggle />
                             </MenuItem>
+
                             <MenuItem onClick={handleMenuClose}>
-                                <SettingsIcon fontSize="small" className='mr-2' />
-                                <ListItemText onClick={handleNavigateToSetting}>Settings</ListItemText>
+                                <span onClick={handleNavigateToSetting}>
+                                    <SettingsIcon fontSize="small" className='mr-2' />
+                                    Settings
+                                </span>
                             </MenuItem>
-                            <MenuItem onClick={handleMenuClose}>
+
+                            <MenuItem onClick={backToLogin}>
                                 <LogoutIcon
-                                    onClick={() => backToLogin}
                                     fontSize="small"
                                     className='mr-2'
                                 />

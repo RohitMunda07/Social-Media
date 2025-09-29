@@ -80,7 +80,11 @@ export default function SignIn() {
 
     try {
       setIsLoading(true);
-      const res = await post("users/login", formData, {
+
+      const res = await post("users/login", {
+        email_UserName: formData.email,
+        password: formData.password
+      }, {
         headers: { "Content-Type": "application/json" }
       })
 
@@ -91,6 +95,8 @@ export default function SignIn() {
       console.log("Login Message", message);
       console.log(res.data);
 
+      localStorage.setItem("auth", "true")
+      
     } catch (error) {
       // console.log(error); // this is error from axios
       const errMsg = error?.response?.data?.message || "Something went wrong";
@@ -101,11 +107,11 @@ export default function SignIn() {
     }
   };
 
-  useEffect(() => {
-    console.log("Updated authStatus:", authStatus);
-    console.log(message);
+  // useEffect(() => {
+  //   console.log("Updated authStatus:", authStatus);
+  //   console.log(message);
 
-  }, [authStatus]);
+  // }, [authStatus]);
 
   return (
     <div className="flex items-center justify-center bg-indigo-50 pt-14 rounded-3xl ">

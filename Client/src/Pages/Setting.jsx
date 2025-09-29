@@ -42,7 +42,7 @@ export default function SettingsPage() {
             style={{
                 padding: "2rem",
                 maxWidth: "800px",
-                margin: "120px auto",
+                margin: "0 auto",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "stretch",
