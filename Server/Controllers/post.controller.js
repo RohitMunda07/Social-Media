@@ -8,7 +8,7 @@ import mongoose from "mongoose"
 // create post
 const createPost = asyncHandler(async (req, res) => {
     // take details from user
-    const { title, description } = req.body
+    const { title, description, communities } = req.body
     const images = req.files
 
 

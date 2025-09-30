@@ -12,13 +12,15 @@ import {
     updateUserCoverImage,
     updateUserAvatar,
     getUserchannelProfile,
-    getUserHistory
+    getUserHistory,
+    getAllRegisteredUser
 } from "../Controllers/user.controller.js"
 import { upload } from "../Middleware/multer.middleware.js";
 
 const router = Router();
 router.route("/register").post(registerUser)
 router.route("/login").post(loginUser)
+router.route("/get-all-registered-user").get(getAllRegisteredUser)
 
 // secure routes
 router.route("/logout").post(verifyJWT, logoutUser)

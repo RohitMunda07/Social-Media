@@ -52,7 +52,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const fullName = email.split('@')[0]
     const userName = "s/" + fullName
     const user = await User.create({
-        userName,
+        userName: userName.toLocaleLowerCase(),
         fullName,
         email,
         password
@@ -524,6 +524,27 @@ const getUserHistory = asyncHandler(async (req, res) => {
         )
 })
 
+// get All registered users
+const getAllRegisteredUser = asyncHandler(async (req, res) => {
+    const getAllUsers = await User.find()
+    if (!getAllUsers) {
+        throw new apiError(404, "No Users created yet")
+    }
+
+    return res
+        .status(200)
+        .json(
+            new apiResponse(
+                200,
+                {
+                    Users: getAllUsers,
+                    TotalUsers: getAllUsers.length
+                },
+                "Fetched All Registered User Successfully"
+            )
+        )
+})
+
 // getUserProfile
 
 // search user based on username and fullname
@@ -576,5 +597,6 @@ export {
     updateUserAvatar,
     updateUserCoverImage,
     getUserchannelProfile,
-    getUserHistory
+    getUserHistory,
+    getAllRegisteredUser
 }
