@@ -1,16 +1,34 @@
 import React, { useState, useRef } from "react";
 import Button from "@mui/material/Button";
 import { post } from "../APIs/api.js"
+import { useEffect } from "react";
 
 export default function CreatePost() {
     const fileInputRef = useRef(null);
     const [images, setImages] = useState([]); // stores selected images
-
+    const [community, setCommunity] = useState([])
     const [postDetails, setPostDetails] = useState({
         heading: "",
         contentText: "",
         images: [],
     })
+    const availableCommunity = [
+        {
+            communityLogo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/coding-setup-modern-workspace-Q2DUA98gMoMr6jtJ7uPv6kgZLyK30M.jpg",
+            communityName: "Web Development",
+            members: 100
+        },
+        {
+            communityLogo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/design-system-ui-components-colorful-ar6FRPYNIa555QL0nXsJcihz9Zmn4x.jpg",
+            communityName: "UI/UX Design",
+            members: 500
+        },
+        {
+            communityLogo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/coding-setup-modern-workspace-Q2DUA98gMoMr6jtJ7uPv6kgZLyK30M.jpg",
+            communityName: "React Developers",
+            members: 280
+        },
+    ]
 
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files); // convert FileList to array
@@ -58,7 +76,8 @@ export default function CreatePost() {
         const formData = new FormData()
         formData.append("title", postDetails.heading)
         formData.append("description", postDetails.contentText)
-
+        formData.append("communities", community)
+        
         postDetails.images.forEach((file) => (
             formData.append("images", file)
         ))
@@ -68,18 +87,34 @@ export default function CreatePost() {
                 headers: { "Content-Type": "multipart/form-data" }
             })
             console.log("Post Created:", res.data);
+            setImages((prev) => prev.splice(0))
+            setPostDetails((prev) => ({
+                ...prev,
+                heading: "",
+                contentText: "",
+                images: images.splice(0)
+            }))
 
         } catch (error) {
             console.log("Error while creating post:", error);
         }
     }
 
+    const handleSelectCommunity = (communityName) => {
+        // avoiding duplicates
+        setCommunity((prev) => prev.includes(communityName) ? (prev.filter((item) => item !== communityName)) : [...prev, communityName])
+    }
+
+    useEffect(() => {
+        console.log(community);
+    }, [community])
+
     console.log(postDetails.heading);
     console.log(postDetails.contentText);
 
     return (
         <section className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto mt-10">
+            <div className="mx-auto mt-10 grid grid-cols-2 items-center gap-x-8"> {/*max-w-4xl*/}
                 <h1 className="font-semibold text-[clamp(5vw,6vw,6.5vw)]">Create Post</h1>
                 <h3 className="text-gray-600 mt-2 text-sm sm:text-base">
                     Share your thoughts with the Connect Sphere community
@@ -145,7 +180,29 @@ export default function CreatePost() {
                         Post
                     </Button>
                 </form>
+
+                {/* Select Community to post */}
+                <div className="bg-[whitesmoke] px-3 py-5 rounded-2xl shadow-lg">
+                    <h1 className="font-bold px-4 pb-3 text-lg">Post to Community</h1>
+                    <ul>
+                        {availableCommunity.length > 0 ? (
+                            availableCommunity.map((item, index) => (
+                                <li key={index} className={`px-3 py-5 hover:bg-gray-200 rounded-2xl ${community.includes(item.communityName) ? "border-l-8 border-l-green-400" : ""}`}
+                                    onClick={() => handleSelectCommunity(item.communityName)}
+                                >
+                                    <div className="flex items-center">
+                                        <img src={item.communityLogo} alt="community-logo" className="w-8 h-8 rounded-full inline-block mr-3" />
+                                        <div className="inline-block">
+                                            <h1 className="font-bold">{item.communityName}</h1>
+                                            <h3 className="text-gray-600">{item.members} members</h3>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))
+                        ) : <p className="mt-2">No Communities to post</p>}
+                    </ul>
+                </div>
             </div>
-        </section>
+        </section >
     );
 }
