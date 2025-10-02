@@ -3,9 +3,10 @@ import { User } from '../Models/user.model.js'
 import { apiError } from '../utils/errorHandler.js'
 import { apiResponse } from '../utils/responseHandler.js'
 import jwt, { decode } from "jsonwebtoken"
-import { use, useDebugValue } from 'react'
+import { use, useDebugValue, useId } from 'react'
 import { addChangeLog } from '../utils/addChangeLog.js'
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
+import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -90,7 +91,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const existUser = await User.findOne({
-        $or: [{ email: email_UserName }, { userName: email_UserName }]
+        $or: [{ email: email_UserName }, { fullName: email_UserName }]
     })
 
     if (!existUser) {
@@ -303,12 +304,16 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // get current user
 const getCurrentUser = asyncHandler(async (req, res) => {
 
+    const currentUser = req.user?._id
+    const populateUser = await User.findById(currentUser)
+        .populate("userPost", "title description images")
+
     return res
         .status(200)
         .json(
             new apiResponse(
                 200,
-                req.user,
+                populateUser,
                 "Fetched Current User Successfully"
             )
         )
@@ -545,6 +550,53 @@ const getAllRegisteredUser = asyncHandler(async (req, res) => {
         )
 })
 
+// delete user
+const deleteUser = asyncHandler(async (req, res) => {
+    const userId = req.user?._id
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+        throw new apiError(400, "Invalid User Id")
+    }
+
+    const { password } = req.body
+    if (!password?.trim()) {
+        throw new apiError(400, "Password is required to delete this account")
+    }
+
+    // ensure logged-in user is deleting their own account
+    if (req.user?._id.toString() !== userId.toString()) {
+        throw new apiError(403, "You are not authorized to delete this account");
+    }
+
+    // find user to validate password
+    const user = await User.findById(req.user?._id)
+    if (!user) {
+        throw new apiError(404, "User Not Found")
+    }
+
+    const isValidPassword = await user.isPasswordCorrect(password)
+
+    if (!isValidPassword) {
+        throw new apiError(400, "Invalid Password")
+    }
+
+    const deletedUser = await User.findByIdAndDelete(userId)
+
+    if (!deletedUser) {
+        throw new apiError(500, "Error while deleting this account")
+    }
+
+    return res
+        .status(200)
+        .json(
+            new apiResponse(
+                200,
+                deletedUser,
+                "Account Deleted Successfully"
+            )
+        )
+
+})
+
 // getUserProfile
 
 // search user based on username and fullname
@@ -598,5 +650,6 @@ export {
     updateUserCoverImage,
     getUserchannelProfile,
     getUserHistory,
-    getAllRegisteredUser
+    getAllRegisteredUser,
+    deleteUser
 }

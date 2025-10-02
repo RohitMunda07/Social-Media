@@ -56,6 +56,13 @@ const userSchema = new Schema({
         type: String
     },
 
+    userPost: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Post"
+        }
+    ],
+
     savedPost: {
         type: Schema.Types.ObjectId,
         ref: "Post"

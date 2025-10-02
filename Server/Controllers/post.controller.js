@@ -3,13 +3,16 @@ import { asyncHandler } from "../utils/asynceHandler.js"
 import { apiResponse } from "../utils/responseHandler.js"
 import { apiError } from "../utils/errorHandler.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { User } from "../Models/user.model.js"
 import mongoose from "mongoose"
+import { Subscription } from "../Models/subscription.model.js"
 
 // create post
 const createPost = asyncHandler(async (req, res) => {
     // take details from user
-    const { title, description, communities } = req.body
+    const { title, description } = req.body
     const images = req.files
+    const currentUser = req.user?._id
 
 
     // validate detatils
@@ -42,22 +45,89 @@ const createPost = asyncHandler(async (req, res) => {
         owner: req.user?._id
     })
 
+    // validate the post
     if (!newPost) {
         throw new apiError(500, "Error while creating a Post")
     }
 
+    // add this post to current user -> available to their profile
+    await User.findByIdAndUpdate(
+        currentUser,
+        {
+            $push: {
+                userPost: newPost?._id
+            }
+        },
+
+        {
+            new: true
+        }
+    )
+
+    let postedToCommunities = []
+
+    // if user subscribes to community -> and wants to post on a community
+    let { communities } = req.body
+    if (typeof (communities) === "string") {
+        try {
+            communities = JSON.parse(communities)
+        } catch (error) {
+            communities = []
+        }
+    }
+    if (Array.isArray(communities) && communities.length > 0) {
+        for (const communityId of communities) {
+            const isSubscribed = await Subscription.findOne({
+                follower: currentUser,
+                channel: communityId
+            })
+
+            if (!isSubscribed) {
+                throw new apiError(400, "You have not subscribed to community")
+            }
+
+            // get the community to post
+            const communityToPost = await User.findByIdAndUpdate(
+                communityId,
+                {
+                    $push: {
+                        userPost: newPost?._id
+                    }
+                },
+
+                {
+                    new: true
+                }
+            )
+                .populate("userPost", "title description images")
+                .select("-watchHistory -password -email -gender -refreshToken -changesHistory -__v")
+
+            postedToCommunities.push(communityToPost)
+        }
+
+    }
+
     // alternative apprach
-    const populatedPost = await Post.findById(newPost?._id)
+    const populatedPost = await User.findById(currentUser?._id)
+        .populate("userPost", "title description images")
+        .select("-watchHistory -password -email -gender -refreshToken -changesHistory -__v")
+
+    const postOwnerDetails = await Post.findById(newPost?._id)
         .populate("owner", "userName fullName avatar")
-        .lean()
 
     return res
         .status(201)
         .json(
             new apiResponse(
                 201,
-                populatedPost,
-                "Post Created Successfully"
+                {
+                    ownerDetail: postOwnerDetails,
+                    post: populatedPost,
+                    postedToCommunities: postedToCommunities
+                },
+                postedToCommunities.length > 0
+                    ? "Post created and shared to communities successfully"
+                    : "Post created successfully"
             )
         )
 
@@ -83,6 +153,48 @@ const createPost = asyncHandler(async (req, res) => {
     //         }
     //     }
     // ])
+
+
+    // post to community
+    // const community = await User.aggregate([
+    //             {
+    //                 $match: {
+    //                     _id: communityId
+    //                 }
+    //             },
+
+    //             {
+    //                 $set: {
+    //                     userPost: newPost
+    //                 }
+    //             },
+
+    //             {
+    //                 $lookup: {
+    //                     from: "posts",
+    //                     localField: "userPost",
+    //                     foreignField: "owner",
+    //                     as: "userPost"
+    //                 }
+    //             },
+
+    //             {
+    //                 $lookup: {
+    //                     from: "users",
+    //                     localField: "owner",
+    //                     foreignField: "_id",
+    //                     as: "owner"
+    //                 }
+    //             },
+
+    //             {
+    //                 $addFields: {
+    //                     postDetails: {
+    //                         $first: "$owner"
+    //                     }
+    //                 }
+    //             }
+    //         ])
 })
 
 // get all posts made by user
@@ -109,7 +221,10 @@ const getAllPostMadeByUser = asyncHandler(async (req, res) => {
         .json(
             new apiResponse(
                 200,
-                allPost,
+                {
+                    allPost,
+                    totalPost: allPost.length
+                },
                 "Fetched all Posts Successfully"
             )
         )
@@ -193,6 +308,14 @@ const deletePost = asyncHandler(async (req, res) => {
             )
         )
 })
+
+// post to community
+// const postToCommunity = asyncHandler(async (req, res) => {
+//     const { communities } = req.body
+//     if (condition) {
+
+//     }
+// })
 
 export {
     createPost,

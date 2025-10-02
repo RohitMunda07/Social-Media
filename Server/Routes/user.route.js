@@ -13,7 +13,8 @@ import {
     updateUserAvatar,
     getUserchannelProfile,
     getUserHistory,
-    getAllRegisteredUser
+    getAllRegisteredUser,
+    deleteUser
 } from "../Controllers/user.controller.js"
 import { upload } from "../Middleware/multer.middleware.js";
 
@@ -32,6 +33,7 @@ router.route("/update-avatar-image").patch(verifyJWT, upload.single('avatar'), u
 router.route("/update-cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage)
 router.route("/get-User-channelProfile/:userName").get(verifyJWT, getUserchannelProfile)
 router.route("/history").get(verifyJWT, getUserHistory)
+router.route("/delete-user").delete(verifyJWT, deleteUser)
 
 // router.route("/search").get(searchQuery)
 

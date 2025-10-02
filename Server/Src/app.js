@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser'
 import { errorMiddleware } from '../Middleware/error.middleware.js';
 import userRouter from '../Routes/user.route.js'
 import postRoute from '../Routes/post.router.js'
+import subscribeRoute from '../Routes/subscription.model.js'
 
 const app = express();
 
@@ -27,6 +28,9 @@ app.use("/api/v1/users", userRouter)
 
 // post route
 app.use("/api/v1/post", postRoute)
+
+// subscription route
+app.use("/api/v1/subscription", subscribeRoute)
 
 app.use(errorMiddleware);
 
