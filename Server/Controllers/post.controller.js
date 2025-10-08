@@ -6,42 +6,70 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { User } from "../Models/user.model.js"
 import mongoose from "mongoose"
 import { Subscription } from "../Models/subscription.model.js"
+import { uploadVideoToCloudinary } from "../utils/uploadVideoToCloudinary.js"
 
 // create post
 const createPost = asyncHandler(async (req, res) => {
+
+    console.log("Files:", req.files);
+
     // take details from user
     const { title, description } = req.body
-    const images = req.files
     const currentUser = req.user?._id
-
 
     // validate detatils
     if ((!title?.trim() || !description?.trim())) {
         throw new apiError(400, "Title and Description is required to create a post")
     }
 
-    // upload image to cloudinary
+    console.log("title and description field test pass");
+
+    // upload media(image/video) to cloudinary
+    const images = req.files.images
+    const videoPath = Array.isArray(req.files?.video) ? req.files.video[0].path : "";
+    let videoData = null;
     const imageUrls = []
+
+    console.log("obtained images and videoPath pass");
+
     try {
+        console.log("Files received over here before uploading:", images);        
+        console.log("Files received over here before uploading req.file.images[0]:", req.files.images[0]);
+
         if (Array.isArray(images) && images.length > 0) {
             for (const image of images) { // in is used for key in object
+                console.log("uploading image:", image.path);
+
                 let cloudinaryRes = await uploadOnCloudinary(image.path)
                 if (cloudinaryRes.url) {
                     imageUrls.push(cloudinaryRes.url)
                 }
             }
+
+            console.log("All images uploaded successfully:", imageUrls);
+        }
+        else console.log("no image file or array");
+
+
+        if (videoPath && videoPath.trim() !== "") {
+            videoData = await uploadVideoToCloudinary(videoPath);
+            console.log("video upload done");
+
         }
 
     } catch (error) {
-        throw new apiError(500, "Error while uploading Image to cloudinary")
+        throw new apiError(500, "Error while uploading media (image/video) to cloudinary");
     }
 
     // creating new post
+    console.log("creating new post..");
+
     const newPost = await Post.create({
         title,
         description,
         isPublished: true,
         images: imageUrls,
+        video: videoData?.videoUrl || null,
         owner: req.user?._id
     })
 
@@ -49,6 +77,9 @@ const createPost = asyncHandler(async (req, res) => {
     if (!newPost) {
         throw new apiError(500, "Error while creating a Post")
     }
+
+    console.log("created new post..");
+
 
     // add this post to current user -> available to their profile
     await User.findByIdAndUpdate(
@@ -114,6 +145,7 @@ const createPost = asyncHandler(async (req, res) => {
 
     const postOwnerDetails = await Post.findById(newPost?._id)
         .populate("owner", "userName fullName avatar")
+        .select("-title -description -images -video -isPublished -views -createdAt -updatedAt -__v")
 
     return res
         .status(201)
@@ -123,7 +155,7 @@ const createPost = asyncHandler(async (req, res) => {
                 {
                     ownerDetail: postOwnerDetails,
                     post: populatedPost,
-                    postedToCommunities: postedToCommunities
+                    postedToCommunities: [postOwnerDetails, postedToCommunities]
                 },
                 postedToCommunities.length > 0
                     ? "Post created and shared to communities successfully"

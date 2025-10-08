@@ -26,6 +26,10 @@ const postSchema = new Schema({
 
     images: [],
 
+    video: {
+        type: String
+    },
+
     views: {
         type: Number,
         default: 0,

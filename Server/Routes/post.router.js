@@ -13,7 +13,10 @@ const router = Router()
 
 router.route("/create").post(
     verifyJWT,
-    upload.array("images"),
+    upload.fields([
+        { name: "images", maxCount: 10 },
+        { name: "video", maxCount: 1 }
+    ]),
     createPost
 )
 
