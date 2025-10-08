@@ -14,7 +14,7 @@ export default function SettingsPage() {
         {
             section: "General",
             items: [
-                { label: "Email address", value: "p1235484@gmail.com" },
+                { label: "Email address", value: "email@gmail.com" },
                 { label: "Phone Number", value: "" },
                 { label: "Password", value: "" },
                 { label: "Gender", value: "Man" },
