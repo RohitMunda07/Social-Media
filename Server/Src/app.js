@@ -6,6 +6,7 @@ import userRouter from '../Routes/user.route.js'
 import postRoute from '../Routes/post.router.js'
 import subscribeRoute from '../Routes/subscription.router.js'
 import videoRouter from "../Routes/video.router.js"
+import saveRouter from "../Routes/save.router.js"
 
 const app = express();
 
@@ -36,6 +37,9 @@ app.use("/api/v1/subscription", subscribeRoute)
 // video route
 app.use("/api/v1/videos", videoRouter)
 // app.use("/api/v1/test", videoRouter)
+
+// save router
+app.use("/api/v1/save", saveRouter)
 
 app.use(errorMiddleware);
 
