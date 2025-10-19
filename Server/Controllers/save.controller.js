@@ -1,10 +1,8 @@
 import { Save } from "../Models/save.model.js";
 import { asyncHandler } from "../utils/asynceHandler.js";
 import { apiError } from "../utils/errorHandler.js";
-import { Post } from "../Models/post.model.js";
 import mongoose from "mongoose";
 import { apiResponse } from "../utils/responseHandler.js";
-import { title } from "process";
 
 // toggle user's post 
 const toggleUserSavePost = asyncHandler(async (req, res) => {
@@ -120,6 +118,28 @@ const toggleUserSavePost = asyncHandler(async (req, res) => {
 // get user's all saved post
 const getAllSavedPost = asyncHandler(async (req, res) => {
     const userId = req.user?._id
+    const { page = 1, limit = 10, sortBy = "createdAt", sortType = "newest" } = req.query;
+
+    const pageNo = Math.max(1, Number(page));
+    const maximumNoOfDocument = Math.min(50, Number(limit));
+    const offset = (pageNo - 1) * maximumNoOfDocument;
+    const normalizeSortType = String(sortType).toLowerCase();
+
+    const SORT_TYPES = {
+        NEWEST: "newest",
+        OLDEST: "oldest"
+    }
+
+    if (!Object.values(SORT_TYPES).includes(normalizeSortType)) {
+        throw new apiError(400, 'Sort Type must be "newst" or "oldest"')
+    }
+
+    // dynamic sorting
+    const sortObject = {
+        sortBy: normalizeSortType === SORT_TYPES.NEWEST ? 1 : -1
+    }
+
+    const totalSavedPost = (await Save.find({ savedBy: userId })).length
 
     const existingSave = await Save.aggregate([
         {
@@ -167,11 +187,34 @@ const getAllSavedPost = asyncHandler(async (req, res) => {
                 savedPost: 1,
                 postDetails: 1
             }
+        },
+        {
+            $sort: sortObject
+        },
+        {
+            $limit: maximumNoOfDocument
+        },
+        {
+            $skip: offset
         }
     ])
 
     if (!existingSave) {
         throw new apiError(404, "No Saved Post Found")
+    }
+
+    const totalPages = Math.ceil(totalSavedPost / maximumNoOfDocument)
+
+    const responseData = {
+        existingSave,
+        pagination: {
+            currentPageNo: pageNo,
+            totalSavedPost,
+            maximumNoOfDocument,
+            savedPostPerPage: Number(limit),
+            hasNextPage: pageNo < maximumNoOfDocument,
+            hasPrevPage: pageNo > 1
+        }
     }
 
     return res
@@ -180,13 +223,39 @@ const getAllSavedPost = asyncHandler(async (req, res) => {
             new apiResponse(
                 200,
                 {
-                    existingSave,
+                    responseData,
                     totalSaves: existingSave.length
                 },
                 "Fetched all users saved post"
             )
         )
 })
+
+// delete saved post
+// const deleteSavedPost = asyncHandler(async (req, res) => {
+//     // get saved post id
+//     const { savedPostId } = req.params;
+
+//     if (!savedPostId.trim() && mongoose.Types.ObjectId.isValid(savedPostId)) {
+//         throw new apiError(400, "Invalid post id")
+//     }
+
+//     const deleteSavedPost = await Save.findByIdAndDelete(savedPostId)
+
+//     if (!deleteSavedPost) {
+//         throw new apiError(500, "Error while deleting the post")
+//     }
+
+//     return res
+//         .status(200)
+//         .json(
+//             new apiResponse(
+//                 200,
+//                 {},
+//                 "Post Deleted Successfully"
+//             )
+//         )
+// })
 
 export {
     toggleUserSavePost,
