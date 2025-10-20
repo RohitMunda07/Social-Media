@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 
 // toggle like state -> comment and post like
 const toggleLike = asyncHandler(async (req, res) => {
-    const { postId, commentId } = req.params
+    const { postId, commentId } = req.query
     if (postId && !mongoose.Types.ObjectId.isValid(postId)) {
         throw new apiError(400, "Invalid post ID");
     }
@@ -19,6 +19,9 @@ const toggleLike = asyncHandler(async (req, res) => {
     let isCommentLiked = false;
     const currentUser = req.user?._id
 
+    let newLikeOnPost = null
+    let aggregatePost = null
+
     if (postId) {
         // toggle like on Post
         const existingLikeOnPost = await Like.findOne({
@@ -26,7 +29,6 @@ const toggleLike = asyncHandler(async (req, res) => {
             likedOnPost: postId
         })
 
-        let newLikeOnPost = null
         if (!existingLikeOnPost) {
             newLikeOnPost = await Like.create({
                 likedBy: currentUser,
@@ -35,6 +37,32 @@ const toggleLike = asyncHandler(async (req, res) => {
 
             isPostLiked = true;
 
+            aggregatePost = await Like.aggregate([
+                {
+                    $match: { _id: newLikeOnPost._id }
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "likedBy",
+                        foreignField: "_id",
+                        as: "likedBy"
+                    }
+                },
+                {
+                    $addFields: {
+                        likedBy: { $first: "$likedBy" }
+                    }
+                },
+                {
+                    $project: {
+                        "likedBy.userName": 1,
+                        "likedBy.avatar": 1
+                    }
+                }
+
+            ])
+
         } else {
             await Like.findByIdAndDelete(existingLikeOnPost?._id)
             isPostLiked = false;
@@ -42,6 +70,9 @@ const toggleLike = asyncHandler(async (req, res) => {
 
     }
 
+
+    let newLikeOnComment = null;
+    let aggregateComment = null;
     if (commentId) {
         // toggle like on Comment
         const existingLikeOnComment = await Like.findOne({
@@ -49,7 +80,6 @@ const toggleLike = asyncHandler(async (req, res) => {
             likedOnComment: commentId
         })
 
-        let newLikeOnComment = null;
         if (!existingLikeOnComment) {
             newLikeOnComment = await Like.create({
                 likedBy: currentUser,
@@ -57,6 +87,32 @@ const toggleLike = asyncHandler(async (req, res) => {
             })
 
             isCommentLiked = true;
+
+            aggregateComment = await Like.aggregate([
+                {
+                    $match: { _id: newLikeOnComment._id }
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "likedBy",
+                        foreignField: "_id",
+                        as: "likedBy"
+                    }
+                },
+                {
+                    $addFields: {
+                        likedBy: { $first: "$likedBy" }
+                    }
+                },
+                {
+                    $project: {
+                        "likedBy.userName": 1,
+                        "likedBy.avatar": 1
+                    }
+                }
+
+            ])
 
         } else {
             await Like.findByIdAndDelete(existingLikeOnComment?._id)
@@ -71,8 +127,8 @@ const toggleLike = asyncHandler(async (req, res) => {
             new apiResponse(
                 200,
                 {
-                    postLike: isPostLiked ? newLikeOnPost : null,
-                    commentLike: isCommentLiked ? newLikeOnComment : null
+                    postLike: isPostLiked ? aggregatePost : null,
+                    commentLike: isCommentLiked ? aggregateComment : null
                 },
                 isPostLiked
                     ? "Post like toggled successfully"

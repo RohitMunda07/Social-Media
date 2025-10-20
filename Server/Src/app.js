@@ -7,6 +7,8 @@ import postRoute from '../Routes/post.router.js'
 import subscribeRoute from '../Routes/subscription.router.js'
 import videoRouter from "../Routes/video.router.js"
 import saveRouter from "../Routes/save.router.js"
+import commentRoute from "../Routes/comment.router.js"
+import likeRoute from "../Routes/like.router.js"
 
 const app = express();
 
@@ -40,6 +42,12 @@ app.use("/api/v1/videos", videoRouter)
 
 // save router
 app.use("/api/v1/save", saveRouter)
+
+// comment router
+app.use("/api/v1/comment", commentRoute)
+
+// Like router
+app.use("/api/v1/like", likeRoute)
 
 app.use(errorMiddleware);
 

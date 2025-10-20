@@ -50,10 +50,13 @@ export default function Header() {
     };
     const handleNavigateToProfile = () => {
         navigate('/user-profile')
+        handleMenuClose()
     }
 
     const handleNavigateToSetting = () => {
         navigate('/settings')
+        handleMenuClose()
+
     }
 
     useEffect(() => {
@@ -111,8 +114,8 @@ export default function Header() {
                                 horizontal: 'right',
                             }}
                         >
-                            <MenuItem onClick={handleMenuClose}>
-                                <span onClick={handleNavigateToProfile}>
+                            <MenuItem onClick={handleNavigateToProfile}>
+                                <span>
                                     <AccountCircleIcon fontSize="small" className='mr-2' />
                                     Profile
                                 </span>
@@ -122,8 +125,8 @@ export default function Header() {
                                 <DarkModeToggle />
                             </MenuItem>
 
-                            <MenuItem onClick={handleMenuClose}>
-                                <span onClick={handleNavigateToSetting}>
+                            <MenuItem onClick={handleNavigateToSetting}>
+                                <span>
                                     <SettingsIcon fontSize="small" className='mr-2' />
                                     Settings
                                 </span>

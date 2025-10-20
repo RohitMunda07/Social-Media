@@ -1,11 +1,11 @@
-import asynceHandler from "../utils/asynceHandler.js"
+import { asyncHandler } from "../utils/asynceHandler.js";
 import { apiResponse } from "../utils/responseHandler.js"
 import { apiError } from "../utils/errorHandler.js"
 import { Comment } from "../Models/comment.model.js"
 import mongoose from "mongoose"
 
 // create comment
-const createComment = asynceHandler(async (req, res) => {
+const createComment = asyncHandler(async (req, res) => {
     // get comment 
     const { comment } = req.body;
     const { postId } = req.params
@@ -72,11 +72,14 @@ const createComment = asynceHandler(async (req, res) => {
 })
 
 // get all comments made by user
-const getAllComment = asynceHandler(async (req, res) => {
+const getAllComment = asyncHandler(async (req, res) => {
     const currentUser = req.user?._id
 
     // get comment from DB
     const comments = await Comment.find({ commentBy: currentUser })
+        .populate("commentBy", "userName avatar")
+        .populate("commentOn", "title description images video views")
+        .select("-createdAt -updatedAt -__v")
 
     if (comments.length === 0) {
         throw new apiError(404, "comments not found")
@@ -94,7 +97,7 @@ const getAllComment = asynceHandler(async (req, res) => {
 })
 
 // delet comment
-const deletComment = asynceHandler(async (req, res) => {
+const deletComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params
     if (!commentId.trim() && !mongoose.Types.ObjectId.isValid(commentId)) {
         throw new apiError(400, "Invalid comment Id")
@@ -119,5 +122,6 @@ const deletComment = asynceHandler(async (req, res) => {
 
 export {
     createComment,
-    getAllComment
+    getAllComment,
+    deletComment
 }

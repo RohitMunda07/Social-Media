@@ -16,3 +16,10 @@ Delete account
 modify the save controller since we are using pagination for lazy loading
 
 link the comment pagination with post
+
+improve user details while creating post
+aggregate user details for comment and like
+
+implement views functionality -> increment whenever user visits
+
+connect front-end and backend

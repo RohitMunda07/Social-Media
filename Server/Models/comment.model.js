@@ -11,6 +11,7 @@ const commentSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Post"
     },
+    
     commentData: {
         type: String,
         required: true,
