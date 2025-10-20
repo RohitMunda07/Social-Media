@@ -6,20 +6,20 @@ const likeSchema = new Schema({
         ref: "User"
     },
 
-    comment: {
+    likedOnComment: {
         type: Schema.Types.ObjectId,
         ref: "Comment"
     },
 
-    post: {
+    likedOnPost: {
         type: Schema.Types.ObjectId,
         ref: "Post",
     },
 
-    video: {
-        type: Schema.Types.ObjectId,
-        ref: "Video"
-    }
+    // video: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Video"
+    // }
     
 }, { Timestamp: true })
 
