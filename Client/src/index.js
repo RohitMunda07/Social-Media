@@ -11,6 +11,7 @@ import Setting from "./Pages/Setting.jsx";
 import SignIn from "./Pages/SignIn.jsx";
 import NotFound from "./Pages/NotFound.jsx";
 import SearchBar from "./Components/SearchBar.jsx";
+import SignUp from "./Pages/SignIUp.jsx"
 
 export {
     Header,
@@ -26,4 +27,5 @@ export {
     Setting,
     SignIn,
     NotFound,
+    SignUp
 }

@@ -81,8 +81,8 @@ export default function SignIn() {
     try {
       setIsLoading(true);
 
-      const res = await post("users/login", {
-        email_UserName: formData.email,
+      const res = await post("users/register", {
+        email: formData.email,
         password: formData.password
       }, {
         headers: { "Content-Type": "application/json" }
@@ -99,7 +99,7 @@ export default function SignIn() {
 
     } catch (error) {
       // console.log(error); // this is error from axios
-      const errMsg = error?.response?.data?.message || "Something went wrong front-end";
+      const errMsg = error?.response?.data?.message || "Something went wrong";
       setMessage("Error: " + errMsg);
       setIsLoading(false)
       dispatch(open())
@@ -169,7 +169,7 @@ export default function SignIn() {
             <div className="inline-flex p-3 bg-indigo-600 rounded-xl mb-3">
               <User size={28} className="text-white" />
             </div>
-            <h2 className="text-2xl font-bold">Welcome Back!</h2>
+            <h2 className="text-2xl font-bold">Sign Up</h2>
             <p className="text-gray-500 text-sm">
               Sign in to continue your journey
             </p>
@@ -286,15 +286,15 @@ export default function SignIn() {
                 Facebook
               </button>
             </div>
-
           </form>
-          {/* Sign Up Link */}
+
+          {/* Login Link */}
           <p className="text-sm text-center mt-4">
-            Don't have an account?{" "}
+            already have an account?{" "}
             <button
-              onClick={() => navigate('/sign-up')}
+              onClick={() => navigate('/sign-in')}
               className="text-indigo-600 hover:underline">
-              Sign up for free
+              login here
             </button>
           </p>
         </div>

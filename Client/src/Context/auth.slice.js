@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { useState } from "react";
 
-const initialAuth = localStorage.getItem("auth") === "true"
+const initialAuth = localStorage.getItem("auth") === "true" ? true : false;
 
 export const authSlice = createSlice({
     name: "auth",

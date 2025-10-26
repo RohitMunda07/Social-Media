@@ -18,20 +18,21 @@ import SearchBar from './SearchBar.jsx';
 
 import './style.css';
 import DarkModeToggle from './DarkModeToggle.jsx';
-import { post } from '../APIs/api.js';
+import { post, get } from '../APIs/api.js';
 
 export default function Header() {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const authStatus = useSelector((state) => state.auth.authStatus);
     const dispatch = useDispatch();
+    const [headerAvatar, setHeaderAvatar] = useState(null)
 
     const backToLogin = async () => {
         handleMenuClose()
         dispatch(setAuthStatus(false))
-        localStorage.setItem("auth", "false")
+        localStorage.clear();
         try {
-            const res = await post("users/logout", {}, {})
+            const res = await post("users/logout")
             console.log("auth status:", authStatus);
             console.log("Logout response:", res.data);
             navigate('/sign-in')
@@ -62,6 +63,11 @@ export default function Header() {
     useEffect(() => {
         console.log("back to login page authStatus:", authStatus);
     }, [authStatus])
+
+    useEffect(() => {
+        const avatar = JSON.parse(localStorage.getItem("localUserDetails"))?.avatar || "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/diverse-user-avatars-jNaliJbW5b5ccprrlYjj99XE0SOY9L.png"
+        setHeaderAvatar(avatar)
+    }, [])
 
 
     return (
@@ -96,7 +102,7 @@ export default function Header() {
 
                         {/* user profile with dropdown */}
                         <div className='nav_right cursor-pointer' onClick={handleMenuOpen}>
-                            <img id='userProfile-img' src="./man.png" alt="pic" className='w-8 h-8 rounded-full bg-gray-300' />
+                            <img id='userProfile-img' src={headerAvatar} alt="pic" className='w-8 h-8 rounded-full bg-gray-300' />
                         </div>
 
                         {/* Dropdown Menu */}
@@ -114,31 +120,30 @@ export default function Header() {
                                 horizontal: 'right',
                             }}
                         >
-                            <MenuItem onClick={handleNavigateToProfile}>
+                            <MenuItem onClick={handleNavigateToProfile} disableGutters disableRipple>
                                 <span>
                                     <AccountCircleIcon fontSize="small" className='mr-2' />
                                     Profile
                                 </span>
                             </MenuItem>
 
-                            <MenuItem onClick={handleMenuClose}>
+                            <MenuItem onClick={handleMenuClose} disableRipple disableGutters>
                                 <DarkModeToggle />
                             </MenuItem>
 
-                            <MenuItem onClick={handleNavigateToSetting}>
+                            <MenuItem onClick={handleNavigateToSetting} disableRipple disableGutters>
                                 <span>
                                     <SettingsIcon fontSize="small" className='mr-2' />
                                     Settings
                                 </span>
                             </MenuItem>
 
-                            <MenuItem onClick={backToLogin}>
-                                <LogoutIcon
-                                    fontSize="small"
-                                    className='mr-2'
-                                />
-                                Logout
-                                {console.log(authStatus)}
+                            <MenuItem onClick={backToLogin} disableRipple disableGutters>
+                                <span>
+                                    <LogoutIcon fontSize="small" className='mr-2' />
+                                    Logout
+                                    {console.log(authStatus)}
+                                </span>
                             </MenuItem>
                         </Menu>
                     </div>) : (

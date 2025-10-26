@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import MenuItem from '@mui/material/MenuItem';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Switch from '@mui/material/Switch';
 import { ListItemIcon, ListItemText } from '@mui/material';
@@ -30,14 +29,23 @@ export default function DarkModeToggle() {
         }
     }, [darkMode])
     return (
-        <MenuItem>
-            <ListItemIcon>
-                <Brightness4Icon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>{darkMode ? "Light Mode" : "Dark Mode"}</ListItemText>
-            <Switch checked={darkMode} onChange={handleThemeToggle}
-                onClick={() => setDarkMode((prev) => !prev)}
-            />
-        </MenuItem>
+        // <div>
+        //     <ListItemIcon>
+        //         <Brightness4Icon fontSize="small" />
+        //     </ListItemIcon>
+        //     <ListItemText>{darkMode ? "Light Mode" : "Dark Mode"}</ListItemText>
+        //     <Switch checked={darkMode} onChange={handleThemeToggle}
+        //         onClick={() => setDarkMode((prev) => !prev)}
+        //     />
+        // </div>
+
+        <div
+            onClick={handleThemeToggle}
+            className="flex items-center justify-between gap-2 px-4 py-2 cursor-pointer"
+        >
+            <Brightness4Icon fontSize="small" />
+            <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
+            <Switch checked={darkMode} />
+        </div>
     )
 }

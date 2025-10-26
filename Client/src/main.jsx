@@ -4,7 +4,7 @@ import './index.css';
 import App from './App.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'; // <-- should be react-router-dom
 import Notification from './Pages/Notification.jsx';
-import { Home, NotFound, Setting, SignIn, UserProfile } from './index.js';
+import { Home, NotFound, Setting, SignIn, UserProfile, SignUp } from './index.js';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Testing from './Components/Testing.jsx';
 import { Provider } from 'react-redux';   
@@ -25,6 +25,7 @@ createRoot(document.getElementById('root')).render(
               <Route path="/user-profile" element={<UserProfile />} />
               <Route path="/settings" element={<Setting />} />
               <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/sign-up" element={<SignUp />} />
               <Route path="/create-post" element={<CreatePost />} />
               <Route path="/testing" element={<Testing />} />
               <Route path="*" element={<NotFound />} />
