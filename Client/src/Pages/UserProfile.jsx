@@ -165,8 +165,7 @@ export default function UserProfile() {
 
             {/* user bio section */}
             <p className='-mt-10 max-w-3xl mb-8'>
-                Full-stack developer passionate about creating amazing user experiences. Love to share knowledge and learn from the community. Always exploring new technologies and building cool stuff!
-
+                {userDetails?.bio}
             </p>
 
             <div>

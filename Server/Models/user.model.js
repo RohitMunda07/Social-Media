@@ -52,6 +52,10 @@ const userSchema = new Schema({
         type: String, // cloudinary string
     },
 
+    bio: {
+        type: String
+    },
+
     coverImage: {
         type: String
     },

@@ -8,17 +8,18 @@ import {
     IconButton
 } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { useNavigate } from "react-router";
 
 export default function SettingsPage() {
+    const navigate = useNavigate();
+    const userDetails = JSON.parse(localStorage.getItem("localUserDetails"))
     const settings = [
         {
             section: "General",
             items: [
-                { label: "Email address", value: "email@gmail.com" },
-                { label: "Phone Number", value: "" },
-                { label: "Password", value: "" },
-                { label: "Gender", value: "Man" },
-                { label: "Location customization", value: "Use approximate location (based on IP)" }
+                { label: "Email address & Phone Number", value: userDetails?.email || "email@gmail.com", path: "/settings/update-email-phone" },
+                { label: "Password", value: "", path: "/setting/update-password" },
+                { label: "User Profile", value: "", path: "/settings/update-user-profile" },
             ]
         },
         {
@@ -63,6 +64,7 @@ export default function SettingsPage() {
                         {section.items.map((item, index) => (
                             <React.Fragment key={index}>
                                 <ListItem
+                                    onClick={() => navigate(item.path)}
                                     secondaryAction={
                                         <IconButton edge="end">
                                             <ArrowForwardIosIcon fontSize="small" />

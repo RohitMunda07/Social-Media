@@ -211,10 +211,10 @@ const updateAccessToken = asyncHandler(async (req, res) => {
 // update user password
 const updateUserPassword = asyncHandler(async (req, res) => {
     // get odd from user
-    const { oldPassword, newPassword } = req.body
+    const { oldPassword, newPassword, confirmPassword } = req.body
 
     // existance check
-    if (!oldPassword || !newPassword) {
+    if (!oldPassword || !newPassword || confirmPassword) {
         throw new apiError(400, "Password fields are required")
     }
 
@@ -233,6 +233,10 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 
     if (oldPassword === newPassword) {
         throw new apiError(403, "New Password can't be same as old")
+    }
+
+    if (newPassword !== confirmPassword) {
+        throw new apiError(400, "New Password does not match confirm password")
     }
 
     // update the change history log
@@ -255,7 +259,7 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 
 // update user Profile
 const updateUserProfile = asyncHandler(async (req, res) => {
-    const allowedFields = ["userName", "fullName", "email", "phoneNumber", "gender"]
+    const allowedFields = ["userName", "fullName", "email", "bio", "phoneNumber", "gender"]
 
     // finding the user
     const user = await User.findById(req.user?._id)
@@ -642,11 +646,11 @@ export {
     registerUser,
     loginUser,
     logoutUser,
+    getCurrentUser,
+    updateUserAvatar,
     updateAccessToken,
     updateUserPassword,
     updateUserProfile,
-    getCurrentUser,
-    updateUserAvatar,
     updateUserCoverImage,
     getUserchannelProfile,
     getUserHistory,
