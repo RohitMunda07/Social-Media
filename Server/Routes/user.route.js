@@ -14,7 +14,8 @@ import {
     getUserchannelProfile,
     getUserHistory,
     getAllRegisteredUser,
-    deleteUser
+    deleteUser,
+    updateEmailPhone
 } from "../Controllers/user.controller.js"
 import { upload } from "../Middleware/multer.middleware.js";
 
@@ -28,6 +29,7 @@ router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/refresh-token").post(updateAccessToken)
 router.route("/update-password").put(verifyJWT, updateUserPassword)
 router.route("/update-user-profile").put(verifyJWT, updateUserProfile)
+router.route("/update-email-phone").put(verifyJWT, updateEmailPhone)
 router.route("/get-current-user").get(verifyJWT, getCurrentUser)
 router.route("/update-avatar-image").put(verifyJWT, upload.single('avatar'), updateUserAvatar)
 router.route("/update-cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage)

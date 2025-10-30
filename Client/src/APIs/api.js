@@ -62,6 +62,12 @@ export const put = async (route, formData = {}, options = {}) => {
     ...options,
     withCredentials: true,
   })
+};
+
+export const del = async (route, formData = {}) => {
+  return await app.delete(route, formData, {
+    withCredentials: true
+  })
 }
 
 export default app;

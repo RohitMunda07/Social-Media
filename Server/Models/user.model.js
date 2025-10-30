@@ -39,9 +39,9 @@ const userSchema = new Schema({
         trim: true
     },
 
-    phoneNumber: {
-        type: Number,
-    },
+    // phoneNumber: {
+    //     type: Number,
+    // },
 
     gender: {
         type: String,

@@ -1,9 +1,19 @@
 import React, { useState } from "react";
+import { put } from "../APIs/api";
 
 export default function UpdateContactInfo() {
+  const [userDetails, setUserDetails] = useState(() => {
+    const saved = localStorage.getItem("localUserDetails")
+    return saved ? JSON.parse(saved) : null
+  })
+
+  // const saved = await get("users/get-current-user")
+  //   console.log("saved data:", saved.data.data);
+  //   return saved ? saved.data.data : null
+
   const [contactInfo, setContactInfo] = useState({
-    email: "",
-    phone: "",
+    email: userDetails?.email || "",
+    // phone: userDetails?.email || "",
   });
 
   const handleChange = (e) => {
@@ -13,9 +23,23 @@ export default function UpdateContactInfo() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Updated Contact Info:", contactInfo);
+    const formData = new FormData()
+    formData.append("email", contactInfo.email)
+    // formData.append("phone", contactInfo.phone)
+
+    try {
+      const res = await put("users/update-email-phone", formData)
+
+      setUserDetails(res.data.data)
+      localStorage.setItem("localUserDetails", JSON.stringify(res.data.data))
+      console.log("Updated Details:", res.data.data);
+
+    } catch (error) {
+      console.log(error?.response?.data?.message || "something went wrong while updating the email and phoneNumber from front-end");
+    }
+    // console.log("Updated Contact Info:", contactInfo);
   };
 
   return (
@@ -42,7 +66,7 @@ export default function UpdateContactInfo() {
           </div>
 
           {/* Phone Number */}
-          <div>
+          {/* <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">
               Phone Number
             </label>
@@ -54,7 +78,7 @@ export default function UpdateContactInfo() {
               placeholder="Enter phone number"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none transition-all"
             />
-          </div>
+          </div> */}
 
           <button
             type="submit"

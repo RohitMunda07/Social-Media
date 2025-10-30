@@ -10,9 +10,9 @@ function NotFound() {
             <h1>404 Page Not Found</h1>
             <Button
                 variant='contained'
-                onClick={() => navigate('/sign-in')}
+                onClick={() => navigate('/')}
             >
-                Sign In
+                Back to home
             </Button>
         </div>
     )

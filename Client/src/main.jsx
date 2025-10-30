@@ -14,6 +14,7 @@ import CreatePost from './Pages/CreatePost.jsx';
 import UpdatePage from './Pages/UpdatePage.jsx';
 import UpdateEmailPhone from './Pages/UpdateEmailPhone.jsx'
 import UpdatePassword from './Pages/UpdatePassword.jsx';
+import DeleteAccountPage from './Pages/DeleteAccount.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -33,7 +34,8 @@ createRoot(document.getElementById('root')).render(
               <Route path="/testing" element={<Testing />} />
               <Route path='/settings/update-user-profile' element={<UpdatePage />} />
               <Route path='/settings/update-email-phone' element={<UpdateEmailPhone />} />
-              <Route path='/setting/update-password' element={<UpdatePassword />} />
+              <Route path='/settings/update-password' element={<UpdatePassword />} />
+              <Route path='/settings/delete-account' element={<DeleteAccountPage />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

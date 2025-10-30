@@ -6,38 +6,20 @@ import { get, post, put } from "../APIs/api.js"
 
 export default function UserProfile() {
 
-    const userData = [
-        {
-            content: "Just discovered this amazing new framework for building web applications! The developer experience is incredible and the performance gains are substantial. Has anyone else tried it out? Would love to hear your thoughts and experiences.",
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/coding-setup-modern-workspace-Q2DUA98gMoMr6jtJ7uPv6kgZLyK30M.jpg",
-            tags: ["#webdev", "#javascript", "#framework"],
-        },
-
-        {
-            content: "Working on a new design system for our startup. The challenge is balancing consistency with flexibility. Here's a sneak peek at our component library - what do you think about the color choices?",
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/design-system-ui-components-colorful-ar6FRPYNIa555QL0nXsJcihz9Zmn4x.jpg",
-            tags: ["#design", "#ui", "#startup"],
-        },
-
-        {
-            content: "Just discovered this amazing new framework for building web applications! The developer experience is incredible and the performance gains are substantial. Has anyone else tried it out? Would love to hear your thoughts and experiences.",
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/coding-setup-modern-workspace-Q2DUA98gMoMr6jtJ7uPv6kgZLyK30M.jpg",
-            tags: ["#webdev", "#javascript", "#framework", "#learning"],
-        },
-        {
-            content: "Just discovered this amazing new framework for building web applications! The developer experience is incredible and the performance gains are substantial. Has anyone else tried it out? Would love to hear your thoughts and experiences.",
-            // image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/coding-setup-modern-workspace-Q2DUA98gMoMr6jtJ7uPv6kgZLyK30M.jpg",
-            // tags: ["#webdev", "#javascript", "#framework", "#learning"],
-        },
-    ]
-
+    const [followers, setFollower] = useState(0)
+    const [followings, setFollowings] = useState(0)
     const [isFollowing, setIsFollowing] = useState(false)
+    const [posts, setPosts] = useState()
+    const [userId, setUserId] = useState()
+    const [comments, setAllComments] = useState()
+
     const [activeTab, setActiveTab] = useState("Posts"); // default active tab
     const tabs = ["Posts", "Comments", "Likes", "Saved", "Overview"];
     const [tempAvatar, setTempAvatar] = useState(null);
     const avatarRef = useRef(null)
     const [uploadProgress, setUploadProgress] = useState(0)
     const [uploadStatus, setUploadStatus] = useState("")
+
     const [userDetails, setUserDetails] = useState(() => {
         const saved = localStorage.getItem("localUserDetails")
         return saved ? JSON.parse(saved) : null;
@@ -48,6 +30,9 @@ export default function UserProfile() {
             try {
                 const res = await get("users/get-current-user")
                 setUserDetails(res.data.data)
+                setUserId(res.data.data?._id)
+                console.log("User_id:", userId);
+
                 localStorage.setItem("localUserDetails", JSON.stringify(res.data.data))
                 console.log("userDetails:", res.data.data);
             } catch (error) {
@@ -55,6 +40,53 @@ export default function UserProfile() {
             }
         }
 
+    }
+
+    const getAllFollowers = async () => {
+        try {
+            const res = await get("subscription/getAllSubscriber")
+            // console.log(res.data.data);
+            // console.log("TotalSubscribers", res.data.data.totalSubscribers);
+            setFollower(res.data.data.totalSubscribers)
+            // console.log("user details after fetching followers", followers);
+
+        } catch (error) {
+            console.log(error?.response?.data?.message || "Error fetching User's followers front-end");
+        }
+    }
+
+    const getAllFollowings = async () => {
+        const res = await get("subscription/getUserfollowings")
+        // console.log("user Following to data", res.data.data);
+        setFollowings(res.data.data.totalFollowings)
+        // console.log(followings);
+
+    }
+
+    const getAllUsersPost = async () => {
+        try {
+            const res = await get("post/get-users-all-post")
+            // console.log("Post data", res.data.data);
+            // console.log("Post data all posts", res.data.data.allPost);
+            setPosts(res.data.data)
+            // console.log("Post Details:", posts);
+
+        } catch (error) {
+            console.log(error?.response?.data?.message);
+
+        }
+    }
+
+    const getAllComments = async () => {
+        try {
+            const res = await get("comment/get-all-comments")
+            setAllComments(res.data.data)
+            console.log("comment data", res.data.data);
+            console.log("comment data commentData", res.data.data?.commentData);
+
+        } catch (error) {
+            console.log(error?.response?.data?.message || "Error fetching comments front-end");
+        }
     }
 
     const handleUpload = () => {
@@ -89,7 +121,8 @@ export default function UserProfile() {
             const updateUser = { ...userDetails, avatar: res.data.data.avatar }
             setUserDetails(updateUser)
             localStorage.setItem("localUserDetails", JSON.stringify(updateUser))
-            setUploadStatus("✅ Upload successful!");
+            // setUploadStatus("✅ Upload successful!");
+            setUploadStatus("");
             console.log("Uploaded Avatar:", res.data.data.avatar);
         } catch (error) {
             setUploadStatus("❌ Upload failed");
@@ -99,6 +132,10 @@ export default function UserProfile() {
 
     useEffect(() => {
         getCurrentUserDetails();
+        getAllFollowers();
+        getAllFollowings();
+        getAllUsersPost();
+        getAllComments();
     }, [])
 
     useEffect(() => {
@@ -134,17 +171,21 @@ export default function UserProfile() {
                 {/* details */}
                 <div className='w-full'>
                     <h1 className='font-semibold text-2xl'>{userDetails?.fullName}</h1>
+
+                    {/* <h1 className='font-semibold text-2xl'>{userId}</h1> */}
+                    {/* {console.log("User_id", userId)} */}
+
                     <h3 className='text-lg'>{userDetails?.userName}</h3>
                     <div className='space-x-8 pt-3 flex flex-col md:flex-row justify-between w-full'>
                         <div className='space-x-5'>
                             <span className='capitalize inline-block'>
-                                <span className='font-semibold'>15</span> posts
+                                <span className='font-semibold'>{posts?.totalPost}</span> posts
                             </span>
                             <span className='capitalize inline-block'>
-                                <span className='font-semibold'>15</span> followings
+                                <span className='font-semibold'>{followings}</span> followings
                             </span>
                             <span className='capitalize inline-block'>
-                                <span className='font-semibold'>155</span> followings
+                                <span className='font-semibold'>{followers}</span> followers
                             </span>
                         </div>
 
@@ -191,13 +232,15 @@ export default function UserProfile() {
                     {/* post content */}
                     {activeTab === "Posts" && (
                         <>
-                            {userData.map((post, ind) => (
+                            {posts?.allPost?.map((post, ind) => (
                                 <div key={ind} className='max-w-2xl'>
+                                    {console.log("Post Id", post?._id)}
                                     <PostCard
-                                        content={post?.content || ""}
-                                        image={post?.image || {}}
+                                        content={post?.description || ""}
+                                        image={post?.images[0] || {}}
                                         tags={post.tags?.map((data) => data) || ""}
-                                        hideFollowBtn={true}
+                                        hideDetails={false}
+                                        deletePostRoute={`post/delete-post/${post?._id}`}
                                     />
                                 </div>
                             ))}
@@ -206,7 +249,18 @@ export default function UserProfile() {
 
                     {/* comment section */}
                     {activeTab === "Comments" && (
-                        <div className="p-5 text-gray-600">User comments will go here...</div>
+                        <>
+                            {comments?.map((comment, ind) => (
+                                <div key={ind} data-comment-id={comment?._id} className='max-w-2xl'>
+                                    <PostCard
+                                        content={comment?.commentData || ""} // first level object
+                                        image={comment?.commentOn?.images[0] || {}} // second level object
+                                        // tags={}
+                                        hideDetails={true}
+                                    />
+                                </div>
+                            ))}
+                        </>
                     )}
 
                     {/* like section */}

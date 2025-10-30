@@ -5,21 +5,38 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
-import Button from '@mui/material/Button'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
+import { DeleteForever } from '@mui/icons-material';
+import { del } from '../APIs/api.js';
 
 
 
-const PostCard = ({ content = "", image = "", tags = [] || "", hideFollowBtn = {} }) => {
+const PostCard = ({ content = "", image = "", tags = [] || "", hideDetails = {}, deleteRoute = "" }) => {
     // const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [like, setLike] = useState(false)
     const [bookmark, setBookMark] = useState(false)
 
+    const handleDelete = async (deleteItem) => {
+        console.log("deleting");
+
+        try {
+            const res = await del(deleteItem, {
+                withCredentials: true
+            })
+            console.log("item deleted successfully", res.data.data);
+
+        } catch (error) {
+            console.log(error?.response?.data?.message || "Error delete item");
+
+        } finally {
+            console.log("deleted successfully");
+        }
+    }
 
     return (
         <div className="py-4 w-full flex items-center flex-col ">
@@ -30,20 +47,24 @@ const PostCard = ({ content = "", image = "", tags = [] || "", hideFollowBtn = {
                 {/* Top: User Info + Content */}
                 <div className="flex items-start gap-4">
                     {/* Profile Pic */}
-                    <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-lg font-bold">
-                        pic
-                    </div>
+                    {!hideDetails &&
+                        (
+                            <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-lg font-bold">
+                                pic
+                            </div>
+                        )
+                    }
 
                     {/* Right Side */}
                     <div className="flex-1">
                         {/* Username */}
                         <div className="px-2 py-1 rounded w-full font-semibold mb-2">
                             <div className='flex justify-between'>
-                                <h2>rohit418 <span className='text-xs'>1h</span></h2>
+                                {!hideDetails && <h2>rohit418 <span className='text-xs'>1h</span></h2>}
 
                                 <div className='flex items-center gap-2'>
                                     <button
-                                        className={`bg-blue-600 text-white ${hideFollowBtn ? "hidden" : ""}`}
+                                        className={`bg-blue-600 text-white ${hideDetails ? "hidden" : ""}`}
                                         style={{
                                             fontSize: '0.75rem',
                                             height: '1.5rem',
@@ -57,10 +78,11 @@ const PostCard = ({ content = "", image = "", tags = [] || "", hideFollowBtn = {
 
 
                                     {/* Dropdown Menu */}
-                                    <MoreVertIcon
+
+                                    {!hideDetails && <MoreVertIcon
                                         onClick={(e) => setAnchorEl(e.currentTarget)}
                                         className="cursor-pointer"
-                                    />
+                                    />}
                                     <Menu
                                         anchorEl={anchorEl}
                                         open={Boolean(anchorEl)}
@@ -72,6 +94,9 @@ const PostCard = ({ content = "", image = "", tags = [] || "", hideFollowBtn = {
                                         </MenuItem>
                                         <MenuItem onClick={() => { setAnchorEl(null); console.log("Report post"); }}>
                                             <ReportGmailerrorredIcon /> Report Post
+                                        </MenuItem>
+                                        <MenuItem onClick={() => handleDelete(deleteRoute)}>
+                                            <DeleteForever /> Delete
                                         </MenuItem>
                                     </Menu>
                                 </div>

@@ -259,7 +259,7 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 
 // update user Profile
 const updateUserProfile = asyncHandler(async (req, res) => {
-    const allowedFields = ["userName", "fullName", "email", "bio", "phoneNumber", "gender"]
+    const allowedFields = ["userName", "fullName", "bio", "gender"]
 
     // finding the user
     const user = await User.findById(req.user?._id)
@@ -303,6 +303,55 @@ const updateUserProfile = asyncHandler(async (req, res) => {
                 "Profile Updated Successfully"
             )
         )
+})
+
+// update email and phoneNumber
+const updateEmailPhone = asyncHandler(async (req, res) => {
+    const allowedFields = ["email",]
+    // find the current user 
+    const user = await User.findById(req.user?._id)
+    if (!user) {
+        throw new apiError(404, "user not found")
+    }
+
+    Object.keys(req.body).forEach((key) => {
+        // check if fields are allowed to update
+        if (!allowedFields.includes(key)) {
+            throw new apiError(400, `${key} is not allowed to update`)
+        }
+
+        // check if the field are empty
+        let field = req.body[key]
+
+        if (typeof field === "string" && field.trim() === "") {
+            throw new apiError(400, `${field} can't be empty`)
+        }
+
+        const oldValue = user[key] !== null ? user[key].toString() : ""
+        user[key] = field
+        const newValue = field !== null ? field.toString() : ""
+
+        // add to change log
+        addChangeLog(user, key, oldValue, newValue);
+    });
+
+    await user.save({ validateBeforeSave: false })
+
+    // omit sensitive data
+    const updatedUser = user.toObject();
+    delete updatedUser.password
+    delete updatedUser.refreshToken
+
+    return res
+        .status(200)
+        .json(
+            new apiResponse(
+                200,
+                updatedUser,
+                "Details updated successfully"
+            )
+        )
+
 })
 
 // get current user
@@ -651,6 +700,7 @@ export {
     updateAccessToken,
     updateUserPassword,
     updateUserProfile,
+    updateEmailPhone,
     updateUserCoverImage,
     getUserchannelProfile,
     getUserHistory,

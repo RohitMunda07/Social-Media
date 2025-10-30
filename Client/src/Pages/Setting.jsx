@@ -33,7 +33,7 @@ export default function SettingsPage() {
         {
             section: "Advanced",
             items: [
-                { label: "Delete account", value: "" }
+                { label: "Delete account", value: "", path: "/settings/delete-account" }
             ]
         }
     ];
