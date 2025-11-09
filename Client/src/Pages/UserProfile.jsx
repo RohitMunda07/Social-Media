@@ -3,6 +3,8 @@ import { PostCard } from '../index.js'
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { get, post, put } from "../APIs/api.js"
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleLike } from '../Context/like.toggle.js';
 
 export default function UserProfile() {
 
@@ -10,6 +12,8 @@ export default function UserProfile() {
     const [followings, setFollowings] = useState(0)
     const [isFollowing, setIsFollowing] = useState(false)
     const [posts, setPosts] = useState()
+    const [likedData, setLikedData] = useState({})
+    const [savePost, setSavePost] = useState([])
     const [userId, setUserId] = useState()
     const [comments, setAllComments] = useState()
 
@@ -81,8 +85,8 @@ export default function UserProfile() {
         try {
             const res = await get("comment/get-all-comments")
             setAllComments(res.data.data)
-            console.log("comment data", res.data.data);
-            console.log("comment data commentData", res.data.data?.commentData);
+            // console.log("comment data", res.data.data);
+            // console.log("comment data commentData", res.data.data?.commentData);
 
         } catch (error) {
             console.log(error?.response?.data?.message || "Error fetching comments front-end");
@@ -129,6 +133,34 @@ export default function UserProfile() {
             console.log(error?.response?.data?.message || "Error while uploading avatar from front-end");
         }
     }
+
+    const handleLikeUpdate = (postId) => {
+        // console.log("Data received from PostCard:", updatedData);
+
+        // CASE 1: if backend returns updatedPost (single post)
+        // setLikedData((prev) => ({
+        //     ...prev,
+        //     postLike: prev.postLike?.[0],
+        //     commentLike: prev.commentLike?.[0]
+        // }))
+        // setLikedData(updatedData)
+        useDispatch(toggleLike(postId))
+        
+    }
+
+    const handleSaveUpdate = (updatedData) => {
+        if (!updatedData) return; // nothing to add
+
+        const normalized = Array.isArray(updatedData)
+            ? updatedData
+            : [updatedData];
+
+        setSavePost((prev) => ({
+            ...prev,
+            updatedData: [...(prev.updatedData || []), ...normalized],
+        }));
+    };
+
 
     useEffect(() => {
         getCurrentUserDetails();
@@ -234,13 +266,15 @@ export default function UserProfile() {
                         <>
                             {posts?.allPost?.map((post, ind) => (
                                 <div key={ind} className='max-w-2xl'>
-                                    {console.log("Post Id", post?._id)}
+                                    {/* {console.log("Post Id", post?._id)} */}
                                     <PostCard
+                                        postId={post?._id}
                                         content={post?.description || ""}
                                         image={post?.images[0] || {}}
                                         tags={post.tags?.map((data) => data) || ""}
                                         hideDetails={false}
-                                        deletePostRoute={`post/delete-post/${post?._id}`}
+                                        // onLikeUpdate={handleLikeUpdate}
+                                        // onSaveUpdate={handleSaveUpdate}
                                     />
                                 </div>
                             ))}
@@ -264,13 +298,57 @@ export default function UserProfile() {
                     )}
 
                     {/* like section */}
+                    {
+                        // likedData && console.log("check liked data: and type", likedData?.[0]?.likedBy?.userName || "unknown")
+                        // likedData && console.log("check liked data: and type", likedData?.postLike?.[0].likedBy?.userName || "unknown")
+                    }
                     {activeTab === "Likes" && (
-                        <div className="p-5 text-gray-600">User liked posts will go here...</div>
+                        <>
+                            {
+                                likedData?.postLike?.length > 0 ? (
+                                    likedData.postLike.map((like, index) => (
+                                        // {
+                                        //     console.log("test", like?.likedBy?.userName);
+                                        // }
+                                        < div key={index} >
+                                            <img className='inline-flex gap-x-3' src={like?.likedBy?.avatar} alt="profil-pic" />
+                                            <h2>liked by: {like?.likedBy?.userName || "unknon"}</h2>
+                                        </div>
+                                    ))
+                                )
+                                    :
+                                    (
+                                        <p>
+                                            No Liked Post
+                                        </p>
+                                    )
+                            }
+                        </>
                     )}
 
                     {/* saved section */}
+                    {/* {console.log("saved data:", savePost)} */}
                     {activeTab === "Saved" && (
-                        <div className="p-5 text-gray-600">User saved posts will go here...</div>
+                        <>
+                            {
+                                savePost?.updatedData?.length > 0 ? (
+                                    savePost.updatedData.map((savePost, index) => (
+                                        <div key={index}>
+                                            <PostCard
+                                                postId={savePost?._id}
+                                                content={savePost?.description || ""}
+                                                image={savePost?.postDetails?.images[0] || {}}
+                                                // tags={post.tags?.map((data) => data) || ""}
+                                                hideDetails={false}
+                                                // onLikeUpdate={handleLikeUpdate}
+                                                // onSaveUpdate={handleSaveUpdate}
+                                            />
+                                        </div>
+                                    ))
+                                ) :
+                                    <div className="p-5 text-gray-600">User saved posts will go here...</div>
+                            }
+                        </>
                     )}
 
                     {/* overview section */}
@@ -280,7 +358,7 @@ export default function UserProfile() {
                         </div>
                     )}
                 </div>
-            </div>
-        </section>
+            </div >
+        </section >
     )
 }

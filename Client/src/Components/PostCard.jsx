@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -11,21 +11,23 @@ import MenuItem from '@mui/material/MenuItem';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import { DeleteForever } from '@mui/icons-material';
-import { del } from '../APIs/api.js';
+import { del, post, put, patch } from '../APIs/api.js';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleLike } from '../Context/like.toggle.js';
 
-
-
-const PostCard = ({ content = "", image = "", tags = [] || "", hideDetails = {}, deleteRoute = "" }) => {
+const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hideDetails = {}, onLikeUpdate = () => { }, onSaveUpdate = () => { } }) => {
     // const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
-    const [like, setLike] = useState(false)
+    const [like, setLike] = useState(null)
     const [bookmark, setBookMark] = useState(false)
+    const dispatch = useDispatch();
+    const likedPosts = useSelector((state) => state.like.likedPosts);
+    const isliked = likedPosts.some((p) => p._id === postId)
 
-    const handleDelete = async (deleteItem) => {
+    const handleDelete = async () => {
         console.log("deleting");
-
         try {
-            const res = await del(deleteItem, {
+            const res = await del(`post/delete-post/${postId}`, {
                 withCredentials: true
             })
             console.log("item deleted successfully", res.data.data);
@@ -33,10 +35,52 @@ const PostCard = ({ content = "", image = "", tags = [] || "", hideDetails = {},
         } catch (error) {
             console.log(error?.response?.data?.message || "Error delete item");
 
-        } finally {
-            console.log("deleted successfully");
         }
     }
+
+    const toggleLikeState = async () => {
+        try {
+            const res = await put(`like/toggle-like`, {}, {
+                params: {
+                    postId: postId
+                },
+                withCredentials: true
+            })
+            console.log(res.data.data);
+            setLike(res.data.data)
+
+            // console.log("sent liked data back");
+            // console.log("liked Data in postCard:", res.data.data);
+            onLikeUpdate(res.data.data)
+        } catch (error) {
+            console.log(error?.response?.data?.message || "Error in toggle like front-end");
+        }
+    }
+
+    const toggleSavePost = async () => {
+        try {
+            const res = await post(`save/save-post/${postId}`, {
+                params: {
+                    postId: postId
+                },
+            })
+            console.log(res.data.data);
+            onSaveUpdate(res.data.data)
+        } catch (error) {
+            console.log(error?.response?.data?.message || "Error in toggle save front-end");
+        }
+    }
+
+    const handleLikeUpdate = (postId) => {
+        dispatch(toggleLike(postId))
+        console.log("LikedPost:", likedPosts);
+    }
+
+    useEffect(() => {
+        console.log("Updated likedPosts:", likedPosts);
+        const isLiked = likedPosts.some((p) => p._id === postId);
+        setLike(isLiked);
+    }, [likedPosts, postId]);
 
     return (
         <div className="py-4 w-full flex items-center flex-col ">
@@ -95,9 +139,12 @@ const PostCard = ({ content = "", image = "", tags = [] || "", hideDetails = {},
                                         <MenuItem onClick={() => { setAnchorEl(null); console.log("Report post"); }}>
                                             <ReportGmailerrorredIcon /> Report Post
                                         </MenuItem>
-                                        <MenuItem onClick={() => handleDelete(deleteRoute)}>
-                                            <DeleteForever /> Delete
-                                        </MenuItem>
+                                        {
+                                            !hideDetails &&
+                                            <MenuItem onClick={() => handleDelete()}>
+                                                <DeleteForever /> Delete
+                                            </MenuItem>
+                                        }
                                     </Menu>
                                 </div>
                             </div>
@@ -135,10 +182,9 @@ const PostCard = ({ content = "", image = "", tags = [] || "", hideDetails = {},
                     <div className='flex gap-3'>
                         <div className="flex items-center gap-1 ">
                             <div className='cursor-pointer hover:text-red-500'
-                                onClick={() => setLike((prev) => !prev)}
+                                onClick={() => handleLikeUpdate(postId)}
                             >
                                 {like ? <FavoriteIcon fontSize="medium" htmlColor='red' /> : <FavoriteBorderIcon fontSize="medium" />}
-
                             </div>
                             <span className="text-sm">10</span>
                         </div>
@@ -152,7 +198,7 @@ const PostCard = ({ content = "", image = "", tags = [] || "", hideDetails = {},
 
                     <div className="flex items-center gap-1 cursor-pointer">
                         <div className='cursor-pointer  hover:text-yellow-600'
-                            onClick={() => setBookMark((prev) => !prev)}
+                            onClick={() => toggleSavePost()}
                         >
                             {bookmark ? <BookmarkIcon fontSize="medium" htmlColor='skyblue' /> : <BookmarkBorderIcon fontSize="medium" />}
                         </div>

@@ -142,7 +142,7 @@ export default function Header() {
                                 <span>
                                     <LogoutIcon fontSize="small" className='mr-2' />
                                     Logout
-                                    {console.log(authStatus)}
+                                    {/* {console.log(authStatus)} */}
                                 </span>
                             </MenuItem>
                         </Menu>

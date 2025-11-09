@@ -4,6 +4,6 @@ import { verifyJWT } from "../Middleware/auth.middleware.js";
 
 const router = Router();
 
-router.route("/toggle-like").patch(verifyJWT, toggleLike)
+router.route("/toggle-like").put(verifyJWT, toggleLike)
 
 export default router

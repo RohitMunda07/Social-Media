@@ -139,6 +139,9 @@ const toggleLike = asyncHandler(async (req, res) => {
         )
 })
 
+// get all likes
+
+
 export {
     toggleLike
 }

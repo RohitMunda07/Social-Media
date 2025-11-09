@@ -64,6 +64,13 @@ export const put = async (route, formData = {}, options = {}) => {
   })
 };
 
+export const patch = async (route, options = {}) => {
+  return await app.patch(route, {
+    ...options,
+    withCredentials: true
+  })
+}
+
 export const del = async (route, formData = {}) => {
   return await app.delete(route, formData, {
     withCredentials: true

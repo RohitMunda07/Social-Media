@@ -287,3 +287,5 @@ export default function SignIn() {
 check this code where's the issue and also check the dispatch when error occurs
 
 for optimization load evey things on local storage
+implement delete post functionality in front-end part
+implement like post functionality in front-end

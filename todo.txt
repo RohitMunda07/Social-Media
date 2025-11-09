@@ -25,3 +25,4 @@ implement views functionality -> increment whenever user visits
 connect front-end and backend
 
 store all the static details in local storage eg: userName, fullName, etc
+get all likes
