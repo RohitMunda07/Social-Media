@@ -15,7 +15,7 @@ export const likeSlice = createSlice({
 
         removeLikeState: (state, action) => {
             const id = action.payload
-            state.likedPosts = state.likedPosts.filter((post) => post !== id)
+            state.likedPosts = state.likedPosts.filter((post) => post._id !== id)
         },
     }
 })

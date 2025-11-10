@@ -11,7 +11,7 @@ export default function UserProfile() {
     const [followers, setFollower] = useState(0)
     const [followings, setFollowings] = useState(0)
     const [isFollowing, setIsFollowing] = useState(false)
-    const [posts, setPosts] = useState()
+    const [posts, setPosts] = useState({})
     const [likedData, setLikedData] = useState({})
     const [savePost, setSavePost] = useState([])
     const [userId, setUserId] = useState()
@@ -23,6 +23,8 @@ export default function UserProfile() {
     const avatarRef = useRef(null)
     const [uploadProgress, setUploadProgress] = useState(0)
     const [uploadStatus, setUploadStatus] = useState("")
+    const saveState = useSelector((state) => state.save.saveState)
+
 
     const [userDetails, setUserDetails] = useState(() => {
         const saved = localStorage.getItem("localUserDetails")
@@ -67,19 +69,41 @@ export default function UserProfile() {
 
     }
 
+
     const getAllUsersPost = async () => {
         try {
             const res = await get("post/get-users-all-post")
-            // console.log("Post data", res.data.data);
-            // console.log("Post data all posts", res.data.data.allPost);
+            console.log(res.data.data);
+
+            // const postsArray = Array.isArray(res.data.data)
+            //     ? res.data.data
+            //     : []
             setPosts(res.data.data)
-            // console.log("Post Details:", posts);
 
         } catch (error) {
-            console.log(error?.response?.data?.message);
-
+            console.log(error?.response?.data?.message)
         }
     }
+
+    // const getAllUsersPost = async () => {
+    //     try {
+    //         const res = await get("post/get-users-all-post")
+    //         // console.log("Post data", res.data.data);
+    //         // console.log("Post data all posts", res.data.data.allPost);
+    //         // normalize response
+
+    //         // setPosts((prev) => ([
+    //         //     ...prev,
+    //         //     Array.isArray(res.data.data) ? res.data.data : [res.data.data]
+    //         // ]))
+    //         // console.log("Post Details:", posts);
+
+    //         setPosts(res.data.data)
+    //     } catch (error) {
+    //         console.log(error?.response?.data?.message);
+
+    //     }
+    // }
 
     const getAllComments = async () => {
         try {
@@ -134,33 +158,51 @@ export default function UserProfile() {
         }
     }
 
-    const handleLikeUpdate = (postId) => {
-        // console.log("Data received from PostCard:", updatedData);
-
-        // CASE 1: if backend returns updatedPost (single post)
-        // setLikedData((prev) => ({
-        //     ...prev,
-        //     postLike: prev.postLike?.[0],
-        //     commentLike: prev.commentLike?.[0]
-        // }))
-        // setLikedData(updatedData)
-        useDispatch(toggleLike(postId))
-        
+    const handlePostDelete = (deletedId) => {
+        setPosts((prev) => {
+            const filteredPosts = prev.allPost?.filter((post) => post._id !== deletedId) || []
+            return {
+                ...prev,                // keep any other keys (like totalPost)
+                allPost: filteredPosts, // update the post list
+                totalPost: filteredPosts.length // optionally update total count
+            }
+        })
     }
 
-    const handleSaveUpdate = (updatedData) => {
-        if (!updatedData) return; // nothing to add
 
-        const normalized = Array.isArray(updatedData)
-            ? updatedData
-            : [updatedData];
+    // const handlePostDelete = (deletedId) => {
+    //     setPosts((prev) => {
+    //         console.log("Prev posts value:", prev)
+    //         return ({... prev.allPost?.filter((post) => post._id !== deletedId)})
+    //     })
+    // }
 
-        setSavePost((prev) => ({
-            ...prev,
-            updatedData: [...(prev.updatedData || []), ...normalized],
-        }));
-    };
+    // const handleLikeUpdate = (postId) => {
+    //     // console.log("Data received from PostCard:", updatedData);
 
+    //     // CASE 1: if backend returns updatedPost (single post)
+    //     // setLikedData((prev) => ({
+    //     //     ...prev,
+    //     //     postLike: prev.postLike?.[0],
+    //     //     commentLike: prev.commentLike?.[0]
+    //     // }))
+    //     // setLikedData(updatedData)
+    //     useDispatch(toggleLike(postId))
+
+    // }
+
+    // const handleSaveUpdate = (updatedData) => {
+    //     if (!updatedData) return; // nothing to add
+
+    //     const normalized = Array.isArray(updatedData)
+    //         ? updatedData
+    //         : [updatedData];
+
+    //     setSavePost((prev) => ({
+    //         ...prev,
+    //         updatedData: [...(prev.updatedData || []), ...normalized],
+    //     }));
+    // };
 
     useEffect(() => {
         getCurrentUserDetails();
@@ -170,9 +212,11 @@ export default function UserProfile() {
         getAllComments();
     }, [])
 
+
     useEffect(() => {
         if (tempAvatar) uploadProfilePic();
-    }, [tempAvatar]);
+        console.log("saved box", saveState);
+    }, [tempAvatar, saveState, posts, setPosts]);
 
     // localAvatar = localStorage.getItem("avatar")
 
@@ -273,8 +317,7 @@ export default function UserProfile() {
                                         image={post?.images[0] || {}}
                                         tags={post.tags?.map((data) => data) || ""}
                                         hideDetails={false}
-                                        // onLikeUpdate={handleLikeUpdate}
-                                        // onSaveUpdate={handleSaveUpdate}
+                                        onPostDelete={handlePostDelete}
                                     />
                                 </div>
                             ))}
@@ -327,26 +370,21 @@ export default function UserProfile() {
                     )}
 
                     {/* saved section */}
-                    {/* {console.log("saved data:", savePost)} */}
+                    {console.log("saved data on redux:", saveState)}
                     {activeTab === "Saved" && (
                         <>
                             {
-                                savePost?.updatedData?.length > 0 ? (
-                                    savePost.updatedData.map((savePost, index) => (
-                                        <div key={index}>
-                                            <PostCard
-                                                postId={savePost?._id}
-                                                content={savePost?.description || ""}
-                                                image={savePost?.postDetails?.images[0] || {}}
-                                                // tags={post.tags?.map((data) => data) || ""}
-                                                hideDetails={false}
-                                                // onLikeUpdate={handleLikeUpdate}
-                                                // onSaveUpdate={handleSaveUpdate}
-                                            />
-                                        </div>
-                                    ))
-                                ) :
-                                    <div className="p-5 text-gray-600">User saved posts will go here...</div>
+                                saveState?.map((post, ind) => (
+                                    <div key={ind} className='max-w-2xl'>
+                                        <PostCard
+                                            postId={post?.postDetails?._id}
+                                            content={post?.postDetails?.description || ""}
+                                            image={post?.postDetails?.images[0] || {}}
+                                            // tags={post.tags?.map((data) => data) || ""}
+                                            hideDetails={false}
+                                        />
+                                    </div>
+                                ))
                             }
                         </>
                     )}
@@ -362,3 +400,8 @@ export default function UserProfile() {
         </section >
     )
 }
+
+// UserProfile.jsx: 140
+//  Uncaught TypeError: prevPosts.filter is not a function
+//     at UserProfile.jsx: 140: 43
+//     at UserProfile(UserProfile.jsx: 14: 31)

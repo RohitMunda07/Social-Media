@@ -14,15 +14,16 @@ import { DeleteForever } from '@mui/icons-material';
 import { del, post, put, patch } from '../APIs/api.js';
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleLike } from '../Context/like.toggle.js';
+import { toggleSave } from '../Context/save.toggle.js';
 
-const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hideDetails = {}, onLikeUpdate = () => { }, onSaveUpdate = () => { } }) => {
+const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hideDetails = {}, onPostDelete = () => { }, }) => {
     // const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [like, setLike] = useState(null)
     const [bookmark, setBookMark] = useState(false)
     const dispatch = useDispatch();
     const likedPosts = useSelector((state) => state.like.likedPosts);
-    const isliked = likedPosts.some((p) => p._id === postId)
+    const saveState = useSelector((state) => state.save.saveState)
 
     const handleDelete = async () => {
         console.log("deleting");
@@ -31,6 +32,7 @@ const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hide
                 withCredentials: true
             })
             console.log("item deleted successfully", res.data.data);
+            onPostDelete(postId)
 
         } catch (error) {
             console.log(error?.response?.data?.message || "Error delete item");
@@ -57,18 +59,10 @@ const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hide
         }
     }
 
-    const toggleSavePost = async () => {
-        try {
-            const res = await post(`save/save-post/${postId}`, {
-                params: {
-                    postId: postId
-                },
-            })
-            console.log(res.data.data);
-            onSaveUpdate(res.data.data)
-        } catch (error) {
-            console.log(error?.response?.data?.message || "Error in toggle save front-end");
-        }
+    const handleSaveUpdate = () => {
+        dispatch(toggleSave(postId))
+        // console.log("savedPost:", );
+
     }
 
     const handleLikeUpdate = (postId) => {
@@ -77,10 +71,11 @@ const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hide
     }
 
     useEffect(() => {
-        console.log("Updated likedPosts:", likedPosts);
+        // console.log("Updated likedPosts:", likedPosts);
         const isLiked = likedPosts.some((p) => p._id === postId);
         setLike(isLiked);
-    }, [likedPosts, postId]);
+        console.log(saveState);
+    }, [likedPosts, postId, saveState,]);
 
     return (
         <div className="py-4 w-full flex items-center flex-col ">
@@ -198,7 +193,7 @@ const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hide
 
                     <div className="flex items-center gap-1 cursor-pointer">
                         <div className='cursor-pointer  hover:text-yellow-600'
-                            onClick={() => toggleSavePost()}
+                            onClick={() => handleSaveUpdate()}
                         >
                             {bookmark ? <BookmarkIcon fontSize="medium" htmlColor='skyblue' /> : <BookmarkBorderIcon fontSize="medium" />}
                         </div>
