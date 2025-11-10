@@ -15,6 +15,7 @@ import UpdatePage from './Pages/UpdatePage.jsx';
 import UpdateEmailPhone from './Pages/UpdateEmailPhone.jsx'
 import UpdatePassword from './Pages/UpdatePassword.jsx';
 import DeleteAccountPage from './Pages/DeleteAccount.jsx';
+import UpdatePostPage from './Pages/UpdatePost.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -31,6 +32,7 @@ createRoot(document.getElementById('root')).render(
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/create-post" element={<CreatePost />} />
+              <Route path="/update-post" element={<UpdatePostPage />} />
               <Route path="/testing" element={<Testing />} />
               <Route path='/settings/update-user-profile' element={<UpdatePage />} />
               <Route path='/settings/update-email-phone' element={<UpdateEmailPhone />} />

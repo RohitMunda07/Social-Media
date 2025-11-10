@@ -18,7 +18,7 @@ export default function UserProfile() {
     const [comments, setAllComments] = useState()
 
     const [activeTab, setActiveTab] = useState("Posts"); // default active tab
-    const tabs = ["Posts", "Comments", "Likes", "Saved", "Overview"];
+    const tabs = ["Posts", "Comments", "Likes", "Saved", ];
     const [tempAvatar, setTempAvatar] = useState(null);
     const avatarRef = useRef(null)
     const [uploadProgress, setUploadProgress] = useState(0)
@@ -390,11 +390,11 @@ export default function UserProfile() {
                     )}
 
                     {/* overview section */}
-                    {activeTab === "Overview" && (
+                    {/* {activeTab === "Overview" && (
                         <div className="p-5 text-gray-600">
                             Overview of user activity will go here...
                         </div>
-                    )}
+                    )} */}
                 </div>
             </div >
         </section >

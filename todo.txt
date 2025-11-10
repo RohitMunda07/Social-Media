@@ -26,3 +26,5 @@ connect front-end and backend
 
 store all the static details in local storage eg: userName, fullName, etc
 get all likes
+
+implement update post page
