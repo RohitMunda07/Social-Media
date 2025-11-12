@@ -1,18 +1,24 @@
 import React, { useState } from "react";
 import { IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Link } from "react-router-dom"; // or next/link if still in Next.js
-import UpdatePostForm  from "../Components/UpdatePostForm.jsx";
+import { Link, useLocation } from "react-router-dom"; // or next/link if still in Next.js
+import UpdatePostForm from "../Components/UpdatePostForm.jsx";
 
 export default function UpdatePostPage() {
     const [preview, setPreview] = useState("");
 
+    // received data form state
+    const location = useLocation()
+    const existingPost1 = location.state.existingPost || {}
+    console.log("existing post form postForm", existingPost1);
+
     // Mock existing post data
     const existingPost = {
-        id: "1",
+        id: existingPost1?.postId,
         content:
-            "Just finished an amazing project with the team! Really proud of what we accomplished together. Check it out and let me know what you think! 🚀",
-        image: "/project-showcase.jpg",
+            existingPost1?.content,
+        image: existingPost1?.image,
+        title: existingPost1?.title,
         createdAt: "2 hours ago",
         likes: 234,
     };
@@ -20,7 +26,7 @@ export default function UpdatePostPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
+            <div className="sticky top-12 z-50 border-b border-gray-200 bg-white shadow-sm">
                 <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Link to="/messages">
@@ -64,7 +70,7 @@ export default function UpdatePostPage() {
 
                             {/* Post Content Preview */}
                             <div className="p-6">
-                                <div className="flex items-center gap-3 mb-4">
+                                {/* <div className="flex items-center gap-3 mb-4">
                                     <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">
                                         YU
                                     </div>
@@ -72,7 +78,12 @@ export default function UpdatePostPage() {
                                         <p className="font-semibold text-gray-900">You</p>
                                         <p className="text-xs text-gray-500">{existingPost.createdAt}</p>
                                     </div>
-                                </div>
+                                </div> */}
+
+                                {console.log("title under update post", existingPost.title)}
+                                <p className="text-gray-800 leading-relaxed mb-4 whitespace-pre-wrap">
+                                    {existingPost?.title}
+                                </p>
 
                                 <p className="text-gray-800 leading-relaxed mb-4 whitespace-pre-wrap">
                                     {document.querySelector("textarea")?.value || existingPost.content}
@@ -94,7 +105,7 @@ export default function UpdatePostPage() {
                     </div>
 
                     {/* Form Section */}
-                    <UpdatePostForm existingPost={existingPost} onPreviewChange={setPreview} />
+                    <UpdatePostForm existingPost={existingPost1} onPreviewChange={setPreview} />
                 </div>
             </div>
         </div>

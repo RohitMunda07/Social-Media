@@ -304,7 +304,7 @@ export default function UserProfile() {
                 </div>
 
                 {/* Content area */}
-                <div id="profile-contents" className="mt-5 w-full grid grid-cols-1 gap-x-5 overflow-x-hidden">
+                <div id="profile-contents" className="mt-5 w-full grid place-items-center overflow-x-hidden">
                     {/* post content */}
                     {activeTab === "Posts" && (
                         <>
@@ -313,6 +313,7 @@ export default function UserProfile() {
                                     {/* {console.log("Post Id", post?._id)} */}
                                     <PostCard
                                         postId={post?._id}
+                                        title={post?.title}
                                         content={post?.description || ""}
                                         image={post?.images[0] || {}}
                                         tags={post.tags?.map((data) => data) || ""}
@@ -400,8 +401,3 @@ export default function UserProfile() {
         </section >
     )
 }
-
-// UserProfile.jsx: 140
-//  Uncaught TypeError: prevPosts.filter is not a function
-//     at UserProfile.jsx: 140: 43
-//     at UserProfile(UserProfile.jsx: 14: 31)

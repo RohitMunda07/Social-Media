@@ -268,7 +268,7 @@ const updatePost = asyncHandler(async (req, res) => {
     const { postId } = req.params
 
     if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
-        throw new apiError(403, "Invalid Post Id")
+        throw new apiError(403, "Invalid Post Id or Id missing")
     }
 
     const newImages = req.files

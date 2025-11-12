@@ -22,7 +22,7 @@ router.route("/create").post(
 
 router.route("/get-users-all-post").get(verifyJWT, getAllPostMadeByUser)
 
-router.route("/update-post/:postId").patch(
+router.route("/update-post/:postId").put(
     verifyJWT,
     upload.array("images"),
     updatePost

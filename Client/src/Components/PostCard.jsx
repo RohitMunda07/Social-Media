@@ -10,13 +10,15 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
+import { Pencil, PencilIcon } from 'lucide-react';
 import { DeleteForever } from '@mui/icons-material';
 import { del, post, put, patch } from '../APIs/api.js';
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleLike } from '../Context/like.toggle.js';
 import { toggleSave } from '../Context/save.toggle.js';
+import UpdatePost from "../Pages/UpdatePost.jsx"
 
-const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hideDetails = {}, onPostDelete = () => { }, }) => {
+const PostCard = ({ postId = "", title = "", content = "", image = "", tags = [] || "", hideDetails = {}, onPostDelete = () => { }, }) => {
     // const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [like, setLike] = useState(null)
@@ -24,6 +26,7 @@ const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hide
     const dispatch = useDispatch();
     const likedPosts = useSelector((state) => state.like.likedPosts);
     const saveState = useSelector((state) => state.save.saveState)
+    const navigate = useNavigate()
 
     const handleDelete = async () => {
         console.log("deleting");
@@ -62,13 +65,23 @@ const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hide
     const handleSaveUpdate = () => {
         dispatch(toggleSave(postId))
         // console.log("savedPost:", );
-
     }
 
     const handleLikeUpdate = (postId) => {
         dispatch(toggleLike(postId))
         console.log("LikedPost:", likedPosts);
     }
+
+    const handleUpdatePost = () => {
+        const existingPostDetails = {
+            title,
+            content,
+            image,
+            postId,
+        };
+
+        navigate("/update-post", { state: { existingPost: existingPostDetails } });
+    };
 
     useEffect(() => {
         // console.log("Updated likedPosts:", likedPosts);
@@ -78,9 +91,8 @@ const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hide
     }, [likedPosts, postId, saveState,]);
 
     return (
-        <div className="py-4 w-full flex items-center flex-col ">
-
-            <div className='bg-[whitesmoke] dark:text-white dark:bg-primary-dark px-8 py-8
+        <div className="py-4 w-full">
+            <div className='bg-[whitesmoke] w-sm dark:text-white dark:bg-primary-dark px-8 py-8
             rounded-3xl outline-0
             '>
                 {/* Top: User Info + Content */}
@@ -131,6 +143,11 @@ const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hide
                                         <MenuItem onClick={() => { setAnchorEl(null); console.log("Hide post"); }}>
                                             <NotInterestedIcon /> Hide Post
                                         </MenuItem>
+
+                                        <MenuItem onClick={() => handleUpdatePost()}>
+                                            <PencilIcon /> Update Post
+                                        </MenuItem>
+
                                         <MenuItem onClick={() => { setAnchorEl(null); console.log("Report post"); }}>
                                             <ReportGmailerrorredIcon /> Report Post
                                         </MenuItem>
@@ -144,13 +161,15 @@ const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hide
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
 
                 {/* Content Section with Read More */}
                 <div className="overflow-hidden bg-gray-100 py-8 rounded dark:text-white dark:bg-primary-dark">
+
+                    <p className="text-start text-lg">
+                        {title.length > 0 && (title)}
+                    </p>
 
                     <p className="text-start text-lg">
                         {content.length > 0 && (content)}
@@ -166,7 +185,7 @@ const PostCard = ({ postId = "", content = "", image = "", tags = [] || "", hide
 
                     <div className='w-full h-full rounded-3xl mt-10'>
                         {image.length > 0 && (<img src={image} alt="post-image"
-                            className='object-cover rounded-3xl'
+                            className='w-[80%] h-[18rem] rounded-3xl'
                         />)
                         }
                     </div>
