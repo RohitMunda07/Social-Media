@@ -92,7 +92,7 @@ const PostCard = ({ postId = "", title = "", content = "", image = "", tags = []
 
     return (
         <div className="py-4 w-full">
-            <div className='bg-[whitesmoke] w-sm dark:text-white dark:bg-primary-dark px-8 py-8
+            <div className='bg-[whitesmoke] w-full dark:text-white dark:bg-primary-dark px-8 py-8
             rounded-3xl outline-0
             '>
                 {/* Top: User Info + Content */}
@@ -185,7 +185,7 @@ const PostCard = ({ postId = "", title = "", content = "", image = "", tags = []
 
                     <div className='w-full h-full rounded-3xl mt-10'>
                         {image.length > 0 && (<img src={image} alt="post-image"
-                            className='w-[80%] h-[18rem] rounded-3xl'
+                            className='w-full h-[20rem] rounded-3xl'
                         />)
                         }
                     </div>

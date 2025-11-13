@@ -5,6 +5,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { get, post, put } from "../APIs/api.js"
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleLike } from '../Context/like.toggle.js';
+import { useNavigate } from 'react-router';
 
 export default function UserProfile() {
 
@@ -18,13 +19,13 @@ export default function UserProfile() {
     const [comments, setAllComments] = useState()
 
     const [activeTab, setActiveTab] = useState("Posts"); // default active tab
-    const tabs = ["Posts", "Comments", "Likes", "Saved", ];
+    const tabs = ["Posts", "Comments", "Likes", "Saved",];
     const [tempAvatar, setTempAvatar] = useState(null);
     const avatarRef = useRef(null)
     const [uploadProgress, setUploadProgress] = useState(0)
     const [uploadStatus, setUploadStatus] = useState("")
     const saveState = useSelector((state) => state.save.saveState)
-
+    const navigate = useNavigate()
 
     const [userDetails, setUserDetails] = useState(() => {
         const saved = localStorage.getItem("localUserDetails")
@@ -273,7 +274,7 @@ export default function UserProfile() {
                                 }}
                                 onClick={(() => setIsFollowing((prev) => !prev))}
                             >{isFollowing ? "Following" : "Follow"}</button>
-                            <button className='border border-gray-300 shadow-lg px-1 py-1 rounded-lg inline-block'><ChatBubbleOutlineIcon /></button>
+                            <button onClick={() => navigate("/chat")} className='border border-gray-300 shadow-lg px-1 py-1 rounded-lg inline-block'><ChatBubbleOutlineIcon /></button>
                             <button className='border border-gray-300 shadow-lg px-1 py-1 rounded-lg inline-block'><MoreHorizIcon /></button>
                         </div>
                     </div>
@@ -304,7 +305,7 @@ export default function UserProfile() {
                 </div>
 
                 {/* Content area */}
-                <div id="profile-contents" className="mt-5 w-full grid place-items-center overflow-x-hidden">
+                <div id="profile-contents" className="mt-5 w-full grid grid-cols-1 place-items-center overflow-x-hidden">
                     {/* post content */}
                     {activeTab === "Posts" && (
                         <>
