@@ -1,17 +1,22 @@
 import mongoose, { Schema } from "mongoose";
 
 const chatSchema = new Schema({
-    sender: {
+    members: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ],
+
+    lastMessage: {
         type: Schema.Types.ObjectId,
-        ref: "User"
+        ref: "Message"
     },
-    receiver: {
-        type: Schema.Types.ObjectId,
-        ref: "User"
-    },
-    message: {
+
+    lastMessagePreview: {
         type: String
     }
+
 }, { timestamps: true })
 
-export const Chat = mongoose.model('Like', chatSchema)
+export const Chat = mongoose.model('Chat', chatSchema)
