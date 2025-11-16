@@ -2,6 +2,7 @@ import { Server } from "socket.io"
 
 // Track online users:  userId → socketId
 let onlineUser = new Map()
+let ioInstance = null;
 
 export function setupSocket(server) {
     const io = new Server(server, {
@@ -10,6 +11,8 @@ export function setupSocket(server) {
             methods: ["GET", "POST"]
         }
     })
+
+    ioInstance = io
 
     io.on("connection", (socket) => {
         console.log("user connected:", socket.id);
@@ -36,6 +39,9 @@ export function setupSocket(server) {
                 io.to(receiverSocketId).emit("receive_message", data)
                 console.log(`New message sent to: ${receiverId}`)
             }
+
+            // notify user
+            io.to(socket.id).emit("message_sent", data)
         })
 
         // -------------------------------
@@ -82,3 +88,9 @@ export function setupSocket(server) {
         })
     })
 }
+
+export function getio() {
+    return ioInstance
+}
+
+export { onlineUser }

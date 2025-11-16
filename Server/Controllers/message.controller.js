@@ -4,6 +4,8 @@ import { asyncHandler } from "../utils/asynceHandler.js"
 import { apiResponse } from "../utils/responseHandler.js"
 import { apiError } from "../utils/errorHandler.js"
 import mongoose, { mongo } from "mongoose";
+import { getio } from "../Src/socket.js";
+import { onlineUser } from "../Src/socket.js";
 
 // create message
 const createMessage = asyncHandler(async (req, res) => {
@@ -51,6 +53,23 @@ const createMessage = asyncHandler(async (req, res) => {
     if (!newMessage) {
         throw new apiError(500, "something went wrong while creating new message")
     }
+
+    // socket setup
+    const io = getio();
+    if (io) {
+        const receiverSocketId = onlineUser.get(selectedUser)
+        const senderSocketId = onlineUser.get(senderId)
+
+        // message sent to receiver
+        if (receiverSocketId) {
+            io.to(receiverId).emit("receive_message", newMessage)
+        }
+
+        if (senderSocketId) {
+            io.to(senderId).emit("message_sent", newMessage)
+        }
+    }
+
 
     // update last message in chat
     let preview = ""
@@ -121,8 +140,11 @@ const getAllMessages = asyncHandler(async (req, res) => {
 // updateMessage
 const updateMessage = asyncHandler(async (req, res) => {
     const { messageId } = req.params
-    const { textMessage } = req.body
+    const { senderId, selectedUser, textMessage } = req.body
 
+    if (!senderId || !mongoose.Types.ObjectId.isValid(senderId)) {
+        throw new apiError(400, "Invalid or Missing ChatId")
+    }
     if (!messageId || !mongoose.Types.ObjectId.isValid(messageId)) {
         throw new apiError(400, "Invalid or Missing ChatId")
     }
@@ -141,6 +163,21 @@ const updateMessage = asyncHandler(async (req, res) => {
         throw new apiError(500, "Error while Editing Message")
     }
 
+    // socket setup
+    const io = getio();
+    if (io) {
+        const receiverSocketId = onlineUser.get(selectedUser)
+        const senderSocketId = onlineUser.get(senderId)
+
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("message_updated", updatedMessage)
+        }
+
+        if (senderSocketId) {
+            io.to(senderSocketId).emit("message_updated", updatedMessage)
+        }
+    }
+
     return res
         .status(200)
         .json(
@@ -155,6 +192,7 @@ const updateMessage = asyncHandler(async (req, res) => {
 // delteMessage
 const deleteMessage = asyncHandler(async (req, res) => {
     const { messageId } = req.params
+    const { senderId, selectedUser } = req.body; // you MUST send this from frontend
 
     if (!messageId || !mongoose.Types.ObjectId.isValid(messageId)) {
         throw new apiError(400, "Invalid or Missing ChatId")
@@ -164,6 +202,21 @@ const deleteMessage = asyncHandler(async (req, res) => {
 
     if (!deletedMessage) {
         throw new apiError(500, "Error while deleting the message")
+    }
+
+    // socket setup
+    const io = getio();
+    if (io) {
+        const receiverSocketId = onlineUser.get(selectedUser)
+        const senderSocketId = onlineUser.get(senderId)
+
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("message_deleted", deletedMessage)
+        }
+
+        if (senderSocketId) {
+            io.to(senderSocketId).emit("message_deleted", deletedMessage)
+        }
     }
 
     return res
@@ -181,5 +234,6 @@ const deleteMessage = asyncHandler(async (req, res) => {
 export {
     createMessage,
     getAllMessages,
+    updateMessage,
     deleteMessage
 }

@@ -9,6 +9,7 @@ import videoRouter from "../Routes/video.router.js"
 import saveRouter from "../Routes/save.router.js"
 import commentRoute from "../Routes/comment.router.js"
 import likeRoute from "../Routes/like.router.js"
+import messageRouter from "../Routes/message.router.js"
 
 const app = express();
 
@@ -48,6 +49,9 @@ app.use("/api/v1/comment", commentRoute)
 
 // Like router
 app.use("/api/v1/like", likeRoute)
+
+// message router
+app.use("/api/v1/message", messageRouter)
 
 app.use(errorMiddleware);
 
