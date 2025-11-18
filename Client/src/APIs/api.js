@@ -36,7 +36,17 @@ import axios from "axios";
 
 const app = axios.create({
   baseURL: "http://localhost:8080/api/v1/",
-  withCredentials: true, // ✅ allow cookies to be sent with every request
+  withCredentials: false, // ✅ allow cookies to be sent with every request
+});
+
+// Add token dynamically for every request
+// Add Token Automatically
+app.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem("token"); // correct key
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const googleAuth = (code) => {
@@ -46,34 +56,34 @@ export const googleAuth = (code) => {
 export const post = async (route, formData = {}, options = {}) => {
   return await app.post(route, formData, {
     ...options,
-    withCredentials: true, // ✅ ensure cookies for POST
+    // withCredentials: true, // ✅ ensure cookies for POST
   });
 };
 
 export const get = async (route, options = {}) => {
   return await app.get(route, {
     ...options,
-    withCredentials: true, // ✅ ensure cookies for GET
+    // withCredentials: true, // ✅ ensure cookies for GET
   });
 };
 
 export const put = async (route, formData = {}, options = {}) => {
   return await app.put(route, formData, {
     ...options,
-    withCredentials: true,
+    // withCredentials: true,
   })
 };
 
 export const patch = async (route, options = {}) => {
   return await app.patch(route, {
     ...options,
-    withCredentials: true
+    // withCredentials: true
   })
 }
 
 export const del = async (route, formData = {}) => {
   return await app.delete(route, formData, {
-    withCredentials: true
+    // withCredentials: true
   })
 }
 

@@ -2,14 +2,22 @@ import React, { useState, useRef, useEffect } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import { useSelector } from "react-redux";
 import { SearchCheckIcon, SearchIcon } from "lucide-react";
+import { post } from "../APIs/api.js";
+import { useLocation } from "react-router";
+import { useChat } from "../Context/chat.context.jsx"
+import { socket } from "../socket.client.js";
 
-export default function ChatWindow({ messages = [], selectedChatData }) {
+export default function ChatWindow() {
   const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef(null);
-  const chatUserDetail = useSelector((state) => state.chat.user)
+  const chatUserDetail = useSelector((state) => state.chat.selectedUser)
   const [findInChat, setFindInChat] = useState(false)
+  const { message: messages, setMessage } = useChat();
 
-  console.log("chat details form messageList", chatUserDetail);
+  // const dataFromSession = JSON.parse(sessionStorage.getItem("user"))?._id
+  // console.log("userId from Session Storage:", dataFromSession);
+
+  // console.log("chat details form messageList", chatUserDetail);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -23,11 +31,36 @@ export default function ChatWindow({ messages = [], selectedChatData }) {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = () => {
-    if (inputMessage.trim()) {
-      // Handle message sending logic here
-      console.log("Message sent:", inputMessage);
+  const handleSend = async () => {
+    if (!inputMessage.trim()) return;
+
+    const senderId = JSON.parse(sessionStorage.getItem("user"))?._id;
+    const selectedUser = chatUserDetail?._id;
+
+    try {
+      const res = await post("message/create-message", {
+        senderId,
+        selectedUser,
+        textMessage: inputMessage,
+      });
+
+      const newMessage = res.data.data;
+
       setInputMessage("");
+
+      // update UI
+      setMessage(prev => [...prev, newMessage]);
+
+      // emit correct data
+      socket.emit("send_message", {
+        receiverId: selectedUser,
+        message: newMessage,
+      });
+
+      console.log("Latest message:", newMessage);
+
+    } catch (error) {
+      console.log("Error:", error?.response?.data?.message);
     }
   };
 
@@ -66,7 +99,7 @@ export default function ChatWindow({ messages = [], selectedChatData }) {
                   : "bg-gray-200 text-gray-800"
                   }`}
               >
-                <p className="text-sm whitespace-pre-wrap break-words">{message.text}</p>
+                <p className="text-sm whitespace-pre-wrap break-words">{message.textMessage}</p>
               </div>
               <span className="text-xs text-gray-500 mt-1">{message.time}</span>
             </div>
@@ -98,3 +131,37 @@ export default function ChatWindow({ messages = [], selectedChatData }) {
     </div>
   );
 }
+
+
+
+// const handleSend = async () => {
+//   // Handle message sending logic here
+//   if (inputMessage.trim()) {
+//     const senderId = JSON.parse(sessionStorage.getItem("user"))?._id
+//     const selectedUser = chatUserDetail?._id
+//     console.log("sender id:", senderId);
+
+//     try {
+//       const res = await post("message/create-message", { senderId, selectedUser, textMessage: inputMessage })
+//       // console.log("Message sent:", inputMessage);
+//       setInputMessage("");
+//       console.log("res afte sending message:", res.data);
+//       const newMessage = res.data.data?.textMessage || ""
+
+//       // Add to UI instantly
+//       setMessage(prev => [...prev, newMessage])
+
+//       // Send via socket to receiver
+//       socket.emit("send_message", {
+//         receiverId: selectedUser,
+//         message: newMessage,
+//       });
+
+//       console.log("Latest message:", newMessage);
+
+//     } catch (error) {
+//       console.log("full error:", error);
+//       console.log(error?.response?.data?.message || "Error sending message from frontend");
+//     }
+//   }
+// };

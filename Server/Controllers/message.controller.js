@@ -8,39 +8,123 @@ import { getio } from "../Src/socket.js";
 import { onlineUser } from "../Src/socket.js";
 
 // create message
-const createMessage = asyncHandler(async (req, res) => {
-    // get the details 
-    const { senderId, textMessage, imageMessages, videoMessage, selectedUser } = req.body
+// const createMessage = asyncHandler(async (req, res) => {
+//     // get the details 
+//     const { senderId, textMessage, imageMessages, videoMessage, selectedUser } = req.body
 
-    // validate details
+//     // validate details
+//     if (!senderId || !mongoose.Types.ObjectId.isValid(senderId)) {
+//         throw new apiError(400, "invalid or missing senderId")
+//     }
+
+//     if (!selectedUser || !mongoose.Types.ObjectId.isValid(selectedUser)) {
+//         throw new apiError(400, "invalid or missing selectedUser")
+//     }
+
+//     const noText = !textMessage || textMessage.length === 0
+//     const noImage = !imageMessages || imageMessages.length === 0
+//     const noVideo = !videoMessage || videoMessage.length === 0
+
+//     if (noText && noImage && noVideo) {
+//         throw new apiError(400, "you can't send an empty message")
+//     }
+
+//     // check existing chat room
+//     let ChatRoom = await Chat.findOne({
+//         members: { $all: [senderId, selectedUser] }
+//     })
+
+//     if (!ChatRoom) {
+//         ChatRoom = await Chat.create({
+//             members: [senderId, selectedUser]
+//         })
+//     }
+
+//     const chatId = ChatRoom?._id
+
+//     const newMessage = await Message.create({
+//         chatId,
+//         senderId,
+//         textMessage: textMessage || "",
+//         imageMessages: Array.isArray(imageMessages) ? imageMessages : [],
+//         videoMessage: Array.isArray(videoMessage) ? videoMessage : []
+//     })
+
+//     if (!newMessage) {
+//         throw new apiError(500, "something went wrong while creating new message")
+//     }
+
+//     // socket setup
+//     const io = getio();
+//     if (io) {
+//         const receiverSocketId = onlineUser.get(selectedUser)
+//         const senderSocketId = onlineUser.get(senderId)
+
+//         // message sent to receiver
+//         if (receiverSocketId) {
+//             io.to(receiverSocketId).emit("receive_message", newMessage)
+//         }
+
+//         if (senderSocketId) {
+//             io.to(senderSocketId).emit("message_sent", newMessage)
+//         }
+//     }
+
+
+//     // update last message in chat
+//     let preview = ""
+//     if (textMessage) preview = textMessage;
+//     else if (imageMessages?.length > 0) preview = "📷 Photo";
+//     else if (videoMessage?.length > 0) preview = "🎥 Video";
+
+//     await Chat.findByIdAndUpdate(chatId, {
+//         lastMessage: newMessage?._id,
+//         lastMessagePreview: preview
+//     })
+
+//     return res
+//         .status(201)
+//         .json(
+//             new apiResponse(
+//                 201,
+//                 newMessage,
+//                 "New Message Created Successfully"
+//             )
+//         )
+// })
+
+// create message
+const createMessage = asyncHandler(async (req, res) => {
+    const { senderId, textMessage, imageMessages, videoMessage, selectedUser } = req.body;
+
     if (!senderId || !mongoose.Types.ObjectId.isValid(senderId)) {
-        throw new apiError(400, "invalid or missing senderId")
+        throw new apiError(400, "invalid or missing senderId");
     }
 
     if (!selectedUser || !mongoose.Types.ObjectId.isValid(selectedUser)) {
-        throw new apiError(400, "invalid or missing selectedUser")
+        throw new apiError(400, "invalid or missing selectedUser");
     }
 
-    const noText = !textMessage || textMessage.length === 0
-    const noImage = !imageMessages || imageMessages.length === 0
-    const noVideo = !videoMessage || videoMessage.length === 0
+    const noText = !textMessage || textMessage.length === 0;
+    const noImage = !imageMessages || imageMessages.length === 0;
+    const noVideo = !videoMessage || videoMessage.length === 0;
 
     if (noText && noImage && noVideo) {
-        throw new apiError(400, "you can't send an empty message")
+        throw new apiError(400, "you can't send an empty message");
     }
 
     // check existing chat room
     let ChatRoom = await Chat.findOne({
         members: { $all: [senderId, selectedUser] }
-    })
+    });
 
     if (!ChatRoom) {
         ChatRoom = await Chat.create({
             members: [senderId, selectedUser]
-        })
+        });
     }
 
-    const chatId = ChatRoom?._id
+    const chatId = ChatRoom?._id;
 
     const newMessage = await Message.create({
         chatId,
@@ -48,31 +132,31 @@ const createMessage = asyncHandler(async (req, res) => {
         textMessage: textMessage || "",
         imageMessages: Array.isArray(imageMessages) ? imageMessages : [],
         videoMessage: Array.isArray(videoMessage) ? videoMessage : []
-    })
+    });
 
     if (!newMessage) {
-        throw new apiError(500, "something went wrong while creating new message")
+        throw new apiError(500, "something went wrong while creating new message");
     }
 
-    // socket setup
+    // SOCKET EMIT FIXED
     const io = getio();
     if (io) {
-        const receiverSocketId = onlineUser.get(selectedUser)
-        const senderSocketId = onlineUser.get(senderId)
+        const receiverSocketId = onlineUser.get(selectedUser);
+        const senderSocketId = onlineUser.get(senderId);
 
-        // message sent to receiver
+        // send to receiver (real time update)
         if (receiverSocketId) {
-            io.to(receiverId).emit("receive_message", newMessage)
+            io.to(receiverSocketId).emit("receive_message", newMessage);
         }
 
+        // send confirmation to sender
         if (senderSocketId) {
-            io.to(senderId).emit("message_sent", newMessage)
+            io.to(senderSocketId).emit("message_sent", newMessage);
         }
     }
 
-
-    // update last message in chat
-    let preview = ""
+    // update last message preview
+    let preview = "";
     if (textMessage) preview = textMessage;
     else if (imageMessages?.length > 0) preview = "📷 Photo";
     else if (videoMessage?.length > 0) preview = "🎥 Video";
@@ -80,18 +164,17 @@ const createMessage = asyncHandler(async (req, res) => {
     await Chat.findByIdAndUpdate(chatId, {
         lastMessage: newMessage?._id,
         lastMessagePreview: preview
-    })
+    });
 
-    return res
-        .status(201)
-        .json(
-            new apiResponse(
-                201,
-                newMessage,
-                "New Message Created Successfully"
-            )
+    return res.status(201).json(
+        new apiResponse(
+            201,
+            newMessage,
+            "New Message Created Successfully"
         )
-})
+    );
+});
+
 
 // getAllMessages
 const getAllMessages = asyncHandler(async (req, res) => {

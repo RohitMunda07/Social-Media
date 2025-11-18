@@ -5,7 +5,7 @@ import {
     getAllMessages,
     updateMessage,
     deleteMessage
-} from "../Controllers/message.controller,js"
+} from "../Controllers/message.controller.js"
 
 const router = Router()
 

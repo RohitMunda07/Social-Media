@@ -28,3 +28,7 @@ store all the static details in local storage eg: userName, fullName, etc
 get all likes
 
 implement update post page
+
+add loader to each page
+
+delete coloudinary images when new images are updated

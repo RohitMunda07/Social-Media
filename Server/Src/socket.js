@@ -22,7 +22,8 @@ export function setupSocket(server) {
         // -------------------------------
         socket.on("register", (userId) => {
             onlineUser.set(userId, socket.id)
-            console.log(`${userId} registered with socket: ${socket.id}`)
+            // console.log(`${userId} registered with socket: ${socket.id}`)
+            console.log("Registered user:", userId, "->", socket.id);
         })
 
 

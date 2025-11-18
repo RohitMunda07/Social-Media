@@ -3,27 +3,32 @@ import { createSlice } from "@reduxjs/toolkit";
 export const chatSlice = createSlice({
     name: "chat",
     initialState: {
-        user: {
+        selectedUser: {
             _id: "",
             userName: "",
             fullName: "",
             avatar: ""
-        }
+        },
+
     },
     reducers: {
         updateChatDetails: (state, action) => {
-            state.user = {
-                ...state.user,
+            state.selectedUser = {
+                ...state.selectedUser,
                 _id: action.payload?._id,
                 userName: action.payload?.userName,
                 fullName: action.payload?.fullName,
                 avatar: action.payload?.avatar
             }
-            console.log("current user to chat:", state.user);
+            console.log("current selected User to chat:", state.selectedUser);
+        },
+        updateSenderAndReceiverId: (state, action) => {
+            state.senderAndReceiverId.senderId = action.payload?.senderId
+            state.senderAndReceiverId.receiverId = action.payload?.receiverId
         }
     }
 })
 
-export const { updateChatDetails } = chatSlice.actions;
+export const { updateChatDetails, updateSenderAndReceiverId } = chatSlice.actions;
 
 export default chatSlice.reducer

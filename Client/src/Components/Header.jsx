@@ -32,7 +32,9 @@ export default function Header() {
         dispatch(setAuthStatus(false))
         localStorage.clear();
         try {
-            const res = await post("users/logout")
+            await post("users/logout")
+            dispatch(setAuthStatus(false))
+            sessionStorage.clear();
             console.log("auth status:", authStatus);
             console.log("Logout response:", res.data);
             navigate('/sign-in')
@@ -49,6 +51,7 @@ export default function Header() {
     const handleMenuClose = () => {
         setAnchorEl(null);
     };
+    
     const handleNavigateToProfile = () => {
         navigate('/user-profile')
         handleMenuClose()

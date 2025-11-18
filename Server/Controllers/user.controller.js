@@ -33,7 +33,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        throw new apiError(401, "Email and Password are required!")
+        throw new apiError(400, "Email and Password are required!")
     }
 
     // check for data field is empty
@@ -114,19 +114,22 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: true,
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000   // 7 days
     };
 
+
     return res.status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
+        // .cookie("accessToken", accessToken, options)
+        // .cookie("refreshToken", refreshToken, options)
         .json(
             new apiResponse(
                 200,
                 {
                     user,
                     accessToken,
-                    refreshToken
+                    // refreshToken
                 },
                 "User Logged In Successfully"
             )
@@ -138,11 +141,11 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findOneAndUpdate(
         req.user._id,
         {
-            $unset: { accessToken: 1 }
+            $unset: { refreshToken: 1 }
         },
-        {
-            new: true
-        }
+        // {
+        //     new: true
+        // }
     )
 
     const options = {
@@ -151,8 +154,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     };
 
     return res.status(200)
-        .clearCookie("accessToken", options)
-        .clearCookie("refreshToken", options)
+        // .clearCookie("accessToken", options)
+        // .clearCookie("refreshToken", options)
         .json(
             new apiResponse(200, {}, "User Logout Successfully")
         )
@@ -184,7 +187,7 @@ const updateAccessToken = asyncHandler(async (req, res) => {
             throw new apiError(404, "refreshToken is expired")
         }
 
-        const { accessToken, newRefreshToken } = await generateAccessAndRefreshToken(user?._id)
+        const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshToken(user._id);
 
         const options = {
             httpOnly: true,
@@ -214,7 +217,7 @@ const updateUserPassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword, confirmPassword } = req.body
 
     // existance check
-    if (!oldPassword || !newPassword || confirmPassword) {
+    if (!oldPassword || !newPassword || !confirmPassword) {
         throw new apiError(400, "Password fields are required")
     }
 
@@ -544,7 +547,7 @@ const getUserHistory = asyncHandler(async (req, res) => {
                 pipeline: [
                     {
                         $lookup: {
-                            from: "user",
+                            from: "users",
                             localField: "owner",
                             foreignField: "_id",
                             as: "owner"
@@ -669,17 +672,18 @@ const searchQuery = asyncHandler(async (req, res) => {
         ]
     })
 
-    if (!findDataOnDb || findDataOnDb.length === 0) {
-        throw new apiError(404, `Search for ${searchData} not found`)
+    if (!users || users.length === 0) {
+        throw new apiError(404, `No results found for ${searchData}`);
     }
 
     return res.status(200).json(
         new apiResponse(
             200,
-            findDataOnDb,
-            `Results realted to ${searchData}`
+            users,
+            `Results related to ${searchData}`
         )
     )
+
 })
 
 // update avatar

@@ -55,7 +55,7 @@ export default function UserProfile() {
             // console.log(res.data.data);
             // console.log("TotalSubscribers", res.data.data.totalSubscribers);
             setFollower(res.data.data.totalSubscribers)
-            // console.log("user details after fetching followers", followers);
+            console.log("user details after fetching followers", followers);
 
         } catch (error) {
             console.log(error?.response?.data?.message || "Error fetching User's followers front-end");
@@ -210,7 +210,7 @@ export default function UserProfile() {
         getAllFollowers();
         getAllFollowings();
         getAllUsersPost();
-        getAllComments();
+        // getAllComments();
     }, [])
 
 

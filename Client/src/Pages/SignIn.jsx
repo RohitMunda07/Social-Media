@@ -18,6 +18,8 @@ import PopUp from "../Components/PopUp";
 import { useSelector, useDispatch } from "react-redux";
 import { open } from "../Context/slice.js";
 import { toggleAuthStatus } from "../Context/auth.slice.js"
+import { updateSenderAndReceiverId } from "../Context/chat.slice.js"
+import { socket } from "../socket.client.js";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -25,6 +27,7 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
   const dispatch = useDispatch();
   const value = useSelector((state) => state.popup.value)
   const authStatus = useSelector((state) => state.auth.authStatus)
@@ -85,17 +88,33 @@ export default function SignIn() {
         email_UserName: formData.email,
         password: formData.password
       }, {
-        headers: { "Content-Type": "application/json" }
+        headers: {
+          "Content-Type": "application/json",
+          // "Authorization": "Bearer "
+        }
       })
+
+      console.log("Received Access Token:", res.data.data?.accessToken);
+      sessionStorage.setItem("token", res.data.data?.accessToken);
+      sessionStorage.setItem("user", JSON.stringify(res.data.data?.user));
 
       setMessage(res?.message || "User Register Successfully")
       setIsLoading(false)
       dispatch(toggleAuthStatus())
       navigate('/')
       console.log("Login Message", message);
-      console.log(res.data);
+      console.log("login data", res.data?.data?.user?._id);
+      const userId = res.data?.data?.user?._id
 
-      localStorage.setItem("auth", "true")
+      // localStorage.setItem("auth", "true")
+      // sessionStorage.setItem("userId", userId)
+
+      // socket connection
+      dispatch(updateSenderAndReceiverId(userId))
+      socket.connect()
+      socket.emit("register", userId)
+      console.log("socket connected successfully");
+
 
     } catch (error) {
       // console.log(error); // this is error from axios

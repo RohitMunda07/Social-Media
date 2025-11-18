@@ -17,6 +17,7 @@ app.use(cors({
     origin: process.env.CORS_ORIGIN,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'], // ⬅️ MUST INCLUDE AUTHORIZATION
 }))
 
 app.use(express.json({ limit: '16kb' }))

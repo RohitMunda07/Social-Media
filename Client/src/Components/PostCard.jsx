@@ -87,7 +87,7 @@ const PostCard = ({ postId = "", title = "", content = "", image = "", tags = []
         // console.log("Updated likedPosts:", likedPosts);
         const isLiked = likedPosts.some((p) => p._id === postId);
         setLike(isLiked);
-        console.log(saveState);
+        // console.log(saveState);
     }, [likedPosts, postId, saveState,]);
 
     return (
