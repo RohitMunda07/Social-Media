@@ -1,72 +1,95 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 import { socket } from "../socket.client";
-import { useContext } from "react";
 
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
     const [message, setMessage] = useState([]);
+    const [isConnected, setIsConnected] = useState(false);
 
     useEffect(() => {
         const user = JSON.parse(sessionStorage.getItem("user"));
 
-        // Only connect if user exists and socket not already connected
-        if (user && !socket.connected) {
-            socket.connect(); // This triggers socket.on("connect") in socket.client.js
+        if (user) {
+            console.log("🔌 ChatProvider - Connecting socket for user:", user._id);
+            
+            if (!socket.connected) {
+                socket.connect();
+                console.log("✅ Socket connect() called");
+            } else {
+                console.log("⚠️  Socket already connected");
+            }
+
+            setIsConnected(true);
+        } else {
+            console.warn("⚠️  No user in sessionStorage");
         }
 
-        // ✅ Listen for messages from other users
+        // Listen for incoming messages
         const handleReceiveMessage = (msg) => {
-            console.log("Message received from other user:", msg);
-            setMessage(prev => [...prev, msg]); // msg is full object
+            console.log("📨 Received message:", msg);
+            setMessage(prev => {
+                if (prev.some(m => m._id === msg._id)) {
+                    return prev;
+                }
+                return [...prev, msg];
+            });
         };
 
-        // ✅ Listen for confirmation of YOUR sent message
+        // Listen for sent message confirmation
         const handleMessageSent = (msg) => {
-            console.log("Your message confirmed:", msg);
-            setMessage(prev => [...prev, msg]);
+            console.log("✅ Message sent confirmation:", msg);
+            setMessage(prev => {
+                if (prev.some(m => m._id === msg._id)) {
+                    return prev;
+                }
+                return [...prev, msg];
+            });
         };
 
         // Listen for message updates
         const handleMessageUpdated = (msg) => {
-            console.log("Message updated:", msg);
-            setMessage((prev) =>
-                prev.map((currMsg) => (currMsg._id === msg._id) ? msg : currMsg)
+            console.log("✏️ Message updated:", msg);
+            setMessage(prev =>
+                prev.map(m => m._id === msg._id ? msg : m)
             );
         };
 
         // Listen for message deletions
         const handleMessageDeleted = (msg) => {
-            console.log("Message deleted:", msg);
-            setMessage((prev) =>
-                prev.filter((currMsg) => currMsg._id !== msg._id)
+            console.log("🗑️ Message deleted:", msg);
+            setMessage(prev =>
+                prev.filter(m => m._id !== msg._id)
             );
         };
 
         socket.on("receive_message", handleReceiveMessage);
-        socket.on("message_sent", handleMessageSent); // ✅ Added this
+        socket.on("message_sent", handleMessageSent);
         socket.on("message_updated", handleMessageUpdated);
         socket.on("message_deleted", handleMessageDeleted);
 
-        // Cleanup
         return () => {
             socket.off("receive_message", handleReceiveMessage);
             socket.off("message_sent", handleMessageSent);
             socket.off("message_updated", handleMessageUpdated);
             socket.off("message_deleted", handleMessageDeleted);
         };
-
     }, []);
 
     return (
-        <ChatContext.Provider value={{ message, setMessage }}>
+        <ChatContext.Provider value={{ message, setMessage, isConnected }}>
             {children}
         </ChatContext.Provider>
     );
 };
 
-export const useChat = () => useContext(ChatContext);
-
+export const useChat = () => {
+    const context = useContext(ChatContext);
+    if (!context) {
+        throw new Error("useChat must be used within ChatProvider");
+    }
+    return context;
+};
 
 
 // previous code

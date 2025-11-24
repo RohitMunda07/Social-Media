@@ -9,7 +9,7 @@ export const chatSlice = createSlice({
             fullName: "",
             avatar: ""
         },
-
+        chatId: ""
     },
     reducers: {
         updateChatDetails: (state, action) => {
@@ -22,6 +22,13 @@ export const chatSlice = createSlice({
             }
             console.log("current selected User to chat:", state.selectedUser);
         },
+
+        updateChatId: (state, action) => {
+            const id = action.payload
+            state.chatId = id
+            console.log("update the chatId in redux", state.chatId);
+        },
+
         updateSenderAndReceiverId: (state, action) => {
             state.senderAndReceiverId.senderId = action.payload?.senderId
             state.senderAndReceiverId.receiverId = action.payload?.receiverId
@@ -29,6 +36,6 @@ export const chatSlice = createSlice({
     }
 })
 
-export const { updateChatDetails, updateSenderAndReceiverId } = chatSlice.actions;
+export const { updateChatDetails, updateChatId, updateSenderAndReceiverId } = chatSlice.actions;
 
 export default chatSlice.reducer

@@ -25,12 +25,16 @@ export default function UserProfile() {
     const [uploadProgress, setUploadProgress] = useState(0)
     const [uploadStatus, setUploadStatus] = useState("")
     const saveState = useSelector((state) => state.save.saveState)
+    const likeState = useSelector((state) => state.like.likedPosts)
+
     const navigate = useNavigate()
 
     const [userDetails, setUserDetails] = useState(() => {
         const saved = localStorage.getItem("localUserDetails")
         return saved ? JSON.parse(saved) : null;
     });
+
+    // console.log("liked post inside the user profile", likeState);
 
     const getCurrentUserDetails = async () => {
         if (!userDetails) {

@@ -8,9 +8,14 @@ export const likeSlice = createSlice({
     reducers: {
         addLikeState: (state, action) => {
             const newLike = action.payload
+            if (!newLike || !newLike.likedPosts) return; // ✅ ignore nulls
+
             if (!state.likedPosts.some((post) => post._id === newLike._id)) {
                 state.likedPosts.push(newLike)
+                console.log("All liked post inside redux", likedPosts);
             }
+
+
         },
 
         removeLikeState: (state, action) => {

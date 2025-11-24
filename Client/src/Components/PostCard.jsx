@@ -43,34 +43,35 @@ const PostCard = ({ postId = "", title = "", content = "", image = "", tags = []
         }
     }
 
-    const toggleLikeState = async () => {
-        try {
-            const res = await put(`like/toggle-like`, {}, {
-                params: {
-                    postId: postId
-                },
-                withCredentials: true
-            })
-            console.log(res.data.data);
-            setLike(res.data.data)
+    // const toggleLikeState = async () => {
+    //     try {
+    //         const res = await put(`like/toggle-like`, {}, {
+    //             params: {
+    //                 postId: postId
+    //             },
+    //             withCredentials: true
+    //         })
+    //         console.log(res.data.data);
+    //         setLike(res.data.data)
 
-            // console.log("sent liked data back");
-            // console.log("liked Data in postCard:", res.data.data);
-            onLikeUpdate(res.data.data)
-        } catch (error) {
-            console.log(error?.response?.data?.message || "Error in toggle like front-end");
-        }
-    }
+    //         // console.log("sent liked data back");
+    //         // console.log("liked Data in postCard:", res.data.data);
+    //         onLikeUpdate(res.data.data)
+    //     } catch (error) {
+    //         console.log(error?.response?.data?.message || "Error in toggle like front-end");
+    //     }
+    // }
 
     const handleSaveUpdate = () => {
         dispatch(toggleSave(postId))
         // console.log("savedPost:", );
     }
 
-    const handleLikeUpdate = (postId) => {
-        dispatch(toggleLike(postId))
-        console.log("LikedPost:", likedPosts);
-    }
+    const handleLikeUpdate = () => {
+        console.log("post id to like", postId);
+        dispatch(toggleLike({ postId }));
+    };
+
 
     const handleUpdatePost = () => {
         const existingPostDetails = {
@@ -196,7 +197,7 @@ const PostCard = ({ postId = "", title = "", content = "", image = "", tags = []
                     <div className='flex gap-3'>
                         <div className="flex items-center gap-1 ">
                             <div className='cursor-pointer hover:text-red-500'
-                                onClick={() => handleLikeUpdate(postId)}
+                                onClick={handleLikeUpdate}
                             >
                                 {like ? <FavoriteIcon fontSize="medium" htmlColor='red' /> : <FavoriteBorderIcon fontSize="medium" />}
                             </div>

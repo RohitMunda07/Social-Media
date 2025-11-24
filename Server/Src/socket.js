@@ -1,150 +1,77 @@
+// ============================================
+// BACKEND: socket.js (COMPLETE & CORRECT)
+// ============================================
 import { Server } from "socket.io";
 
-let onlineUser = new Map();
+// ✅ CRITICAL: Initialize global.onlineUser if it doesn't exist
+if (!global.onlineUser) {
+    global.onlineUser = new Map();
+    console.log("✅ Created global.onlineUser Map");
+}
 
 export const setupSocket = (server) => {
-    console.log("\n🔧 setupSocket() called with server:", !!server);
+    console.log("\n🔧 setupSocket() called");
 
     const io = new Server(server, {
         cors: {
-            origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+            origin: process.env.CORS_ORIGIN || "*",
             methods: ["GET", "POST"],
-            credentials: true
+            credentials: true,
+            allowedHeaders: ["*"]
         },
-        transports: ["websocket", "polling"]
+        transports: ["websocket", "polling"],
+        pingInterval: 10000,
+        pingTimeout: 5000
     });
 
     console.log("✅ Socket.IO instance created");
 
     io.on("connection", (socket) => {
-        console.log("\n🔗 User connected:", socket.id);
+        console.log("\n🔗 NEW CONNECTION");
+        console.log("   Socket ID:", socket.id);
+        console.log("   Transport:", socket.conn.transport.name);
 
+        // REGISTER USER - Use global.onlineUser
         socket.on("register", (userId) => {
-            console.log("📝 Register - User:", userId, "Socket:", socket.id);
-            onlineUser.set(userId, socket.id);
-            console.log("📊 Online users:", Array.from(onlineUser.keys()));
+            console.log("\n📝 REGISTER EVENT");
+            console.log("   User ID:", userId);
+            console.log("   Socket ID:", socket.id);
+
+            if (userId && userId.trim()) {
+                global.onlineUser.set(userId, socket.id);
+                console.log("✅ User registered in global.onlineUser");
+                console.log("📊 Total online users:", global.onlineUser.size);
+                console.log("📊 All users:", Array.from(global.onlineUser.keys()));
+            } else {
+                console.warn("⚠️  Invalid userId:", userId);
+            }
         });
 
         socket.on("disconnect", () => {
-            console.log("❌ Disconnected:", socket.id);
-            for (let [userId, socketId] of onlineUser) {
+            console.log("\n❌ DISCONNECT - Socket ID:", socket.id);
+
+            for (let [userId, socketId] of global.onlineUser) {
                 if (socketId === socket.id) {
-                    onlineUser.delete(userId);
+                    global.onlineUser.delete(userId);
+                    console.log("✅ User removed:", userId);
                     break;
                 }
             }
+            console.log("📊 Remaining users:", global.onlineUser.size);
+        });
+
+        socket.on("error", (error) => {
+            console.error("❌ Socket error:", error);
         });
     });
 
-    // ✅ ATTACH IO TO SERVER OBJECT SO IT PERSISTS
     server.io = io;
-    console.log("✅ IO attached to server object");
+    console.log("✅ IO attached to server object\n");
 
     return io;
 };
 
-export const getio = () => {
-    // This will try to get it from global or return null
-    return global.ioInstance || null;
+// Export getter function (optional - we use global directly)
+export const getOnlineUsers = () => {
+    return global.onlineUser;
 };
-
-export { onlineUser };
-
-
-// import { Server } from "socket.io"
-
-// // Track online users:  userId → socketId
-// let onlineUser = new Map()
-// let ioInstance = null;
-
-// export function setupSocket(server) {
-//     const io = new Server(server, {
-//         cors: {
-//             origin: process.env.CORS_ORIGIN,
-//             methods: ["GET", "POST"]
-//         }
-//     })
-
-//     ioInstance = io
-
-//     io.on("connection", (socket) => {
-//         console.log("user connected:", socket.id);
-
-//         // -------------------------------
-//         // REGISTER USER
-//         // -------------------------------
-//         socket.on("register", (userId) => {
-//             onlineUser.set(userId, socket.id)
-//             // console.log(`${userId} registered with socket: ${socket.id}`)
-//             console.log("Registered user:", userId, "->", socket.id);
-//         })
-
-
-//         // -------------------------------
-//         // SEND NEW MESSAGE
-//         // -------------------------------
-//         socket.on("send_message", (data) => {
-//             // data = { receiverId, message }
-//             const { receiverId, message } = data
-
-//             const receiverSocketId = onlineUser.get(receiverId)
-
-//             if (receiverSocketId) {
-//                 io.to(receiverSocketId).emit("receive_message", data)
-//                 console.log(`New message sent to: ${receiverId}`)
-//             }
-
-//             // notify user
-//             io.to(socket.id).emit("message_sent", data)
-//         })
-
-//         // -------------------------------
-//         // UPDATE MESSAGE
-//         // -------------------------------
-//         socket.on("update_message", (data) => {
-//             // data = { receiverId, updatedMessage }
-//             const { receiverId } = data
-//             const receiverSocketId = onlineUser.get(receiverId)
-
-//             if (receiverSocketId) {
-//                 io.to(receiverSocketId).emit("message_updated", data)
-//                 console.log(`Message updated for: ${receiverId}`)
-//             }
-//         })
-
-
-//         // -------------------------------
-//         // DELETE MESSAGE
-//         // -------------------------------
-//         socket.on("delete_message", (data) => {
-//             // data = { receiverId, messageId }
-//             const { receiverId } = data
-//             const receiverSocketId = onlineUser.get(receiverId)
-
-//             if (receiverSocketId) {
-//                 io.to(receiverSocketId).emit("message_deleted", data)
-//                 console.log(`Message deleted for: ${receiverId}`)
-//             }
-//         })
-
-
-//         // -------------------------------
-//         // DISCONNECT USER
-//         // -------------------------------
-//         socket.on("disconnect", () => {
-//             for (let [userId, id] of onlineUser) {
-//                 if (id === socket.id) {
-//                     onlineUser.delete(userId)
-//                     console.log(`User disconnected: ${userId}`)
-//                     break
-//                 }
-//             }
-//         })
-//     })
-// }
-
-// export function getio() {
-//     return ioInstance
-// }
-
-// export { onlineUser }

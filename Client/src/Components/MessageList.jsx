@@ -3,7 +3,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import { get } from "../APIs/api.js";
 import { SearchIcon } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { updateChatDetails } from "../Context/chat.slice.js"
+import { updateChatDetails, updateChatId } from "../Context/chat.slice.js"
 
 
 export default function MessageList({ chats = [], selectedChat, onSelectChat, searchQuery }) {
@@ -27,10 +27,33 @@ export default function MessageList({ chats = [], selectedChat, onSelectChat, se
     console.log(searchChat);
   }
 
+  const getChatId = async (senderId, selectedUser) => {
+    console.log("before getting chatId senderId", senderId, "selectedUser", selectedUser);
+
+    try {
+      const res = await get("message/find-existing-chatid", {
+        params: {
+          senderId,
+          selectedUser
+        }
+      })
+
+      console.log("Got the chat id from backend:", res.data.data);
+      dispatch(updateChatId(res.data.data))
+
+    } catch (error) {
+      console.log("full error", error);
+    }
+  }
+
   const handleSelectedChat = (chatId) => {
     const selectedUser = followers.filter((user) => user?._id === chatId)
     console.log("selected user:", selectedUser?.[0] || "empty");
     dispatch(updateChatDetails(selectedUser?.[0]))
+
+    const senderId = JSON.parse(sessionStorage.getItem("user"))?._id
+    const selectedUserId = selectedUser?.[0]?._id
+    getChatId(senderId, selectedUserId);
   }
 
   const getAllFollowers = async () => {

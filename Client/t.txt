@@ -289,3 +289,38 @@ check this code where's the issue and also check the dispatch when error occurs
 for optimization load evey things on local storage
 implement delete post functionality in front-end part
 implement like post functionality in front-end
+
+
+
+
+
+current scnario
+refresh the page and the page is fresh new-> got both user connected just like this
+
+🔗 NEW CONNECTION
+   Socket ID: hts4ogxnbEP3-J9FAAAX
+   Transport: websocket
+   Query params: [Object: null prototype] {
+  userId: '68dea8b13dcd700741c1d79c',
+  EIO: '4',
+  transport: 'websocket'
+}
+📝 REGISTER EVENT
+   User ID: 68dea8b13dcd700741c1d79c
+   Socket ID: hts4ogxnbEP3-J9FAAAX
+✅ User registered in onlineUser map
+📊 Total online users: 2
+📊 All users: [ '68db5daf45a0ad58fd49445d', '68dea8b13dcd700741c1d79c' ]
+
+issue arise when i select the user from chatwindow to chat and when i send message form any of the tab the current user who is sending the message somehow got invisible or not able to get the current user id
+and got this issue below
+
+
+========== 📤 SENDING MESSAGE ==========
+Message: new ObjectId('69212be46af0a61c9b74b0a2')
+✅ IO instance check: true
+📊 Online users: 0
+📊 Users: []
+📤 Receiver socket: undefined
+📤 Sender socket: undefined
+========================================

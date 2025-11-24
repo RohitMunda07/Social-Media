@@ -1,35 +1,48 @@
-import { put } from "../APIs/api.js";
+import { post } from "../APIs/api.js";
 import { addLikeState, removeLikeState } from "./like.slice.js";
-import { useSelector, useDispatch } from "react-redux";
 
-export const toggleLike = (postId) => async (dispatch) => {
+export const toggleLike = ({ postId = null, commentId = null }) =>
+    async (dispatch, getState) => {
+        try {
+            console.log("post id received to like", postId);
+            const res = await post(`like/toggle-like/${postId}`, null, {
+                params: { commentId }
+            });
 
-    try {
-        const res = await put(
-            `like/toggle-like`,
-            {},
-            {
-                params: { postId },
-                withCredentials: true,
+            const { postLike, commentLike } = res.data.data;
+
+            console.log("API Like Response:", { postLike, commentLike });
+
+            const state = getState();
+            console.log("getState:", state);
+
+            // --- POST LIKE TOGGLED ---
+            if (postId) {
+                if (postLike) {
+                    dispatch(addLikeState(postLike));
+                    console.log("Post Liked:", postLike);
+                } else {
+                    dispatch(removeLikeState(postId));
+                    console.log("Post Unliked:", postId);
+                }
             }
-        );
 
-        const data = res.data.data
-        console.log(data);
+            // --- COMMENT LIKE TOGGLED ---
+            if (commentId) {
+                if (commentLike) {
+                    dispatch(addLikeState({ type: "comment", data: commentLike }));
+                    console.log("Comment Liked:", commentLike);
+                } else {
+                    dispatch(removeLikeState({ type: "comment", id: commentId }));
+                    console.log("Comment Unliked:", commentId);
+                }
+            }
 
-        // extract likedPost from the data received from backend
-        const likedPost = data?.postLike?.[0]
-
-        if (likedPost) {
-            dispatch(addLikeState(likedPost))
-            console.log("likedPosts:", likedPost);
-        } else {
-            dispatch(removeLikeState(postId))
-            // const likedPost = useSelector((state) => state.like.likedPosts)
-            // console.log("likedPosts:", likedPost);
+        } catch (error) {
+            console.error("Full Error:", error);
+            console.error(
+                error?.response?.data?.message ||
+                "Error in toggle like front-end"
+            );
         }
-    } catch (error) {
-        console.log("Full error:", error);
-        console.log(error?.response?.data?.message || "Error in toggle like front-end");
-    }
-}
+    };
