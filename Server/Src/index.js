@@ -1,42 +1,36 @@
-// ============================================
-// index.js (UPDATED)
-// ============================================
+// Server/Src/index.js — Serverless entry for Vercel
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import connectDB from '../DataBase/index.js';
+import { app } from './app.js';
 
-import dotenv from 'dotenv'
-import connectDB from '../DataBase/index.js'
-import { app } from './app.js'
-import { setupSocket } from './socket.js'
-import http from "http"
+dotenv.config({ path: './env' }); // optional locally; Vercel uses process.env
 
-dotenv.config({
-    path: './env'
-})
+/**
+ * Ensure DB is connected and reuse connection across invocations.
+ * Mongoose readyState: 0 = disconnected, 1 = connected
+ */
+async function ensureDb() {
+  if (mongoose.connection.readyState === 1) return;
+  // connectDB logs and exits on failure — cache the Promise to avoid racing
+  if (!global.__dbConnectPromise) {
+    global.__dbConnectPromise = connectDB();
+  }
+  await global.__dbConnectPromise;
+}
 
-connectDB()
-    .then(() => {
-        console.log("✅ Database connected");
-
-        const server = http.createServer(app);
-        console.log("✅ HTTP server created");
-
-        // Setup Socket.IO
-        const io = setupSocket(server);
-
-        // ✅ STORE IN GLOBAL SCOPE
-        global.ioInstance = io;
-        console.log("✅ IO stored in global.ioInstance:", !!global.ioInstance);
-
-        server.on("error", (err) => {
-            console.error("❌ Server error:", err);
-            throw err;
-        });
-
-        const PORT = process.env.PORT || 8000;
-        server.listen(PORT, () => {
-            console.log(`✅ Server listening on PORT: ${PORT}\n`);
-        });
-    })
-    .catch((err) => {
-        console.error("❌ Error:", err);
-        process.exit(1);
-    });
+/**
+ * Vercel Node (serverless) handler — delegate to your Express app.
+ * Export a default function that receives (req, res).
+ */
+export default async function handler(req, res) {
+  try {
+    await ensureDb();
+    // Express app is a request handler — call it directly
+    return app(req, res);
+  } catch (err) {
+    console.error('Serverless handler error:', err);
+    res.statusCode = 500;
+    res.json({ success: false, message: 'Internal Server Error' });
+  }
+}
