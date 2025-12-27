@@ -24,8 +24,10 @@ async function ensureDb() {
  */
 export default async function handler(req, res) {
   try {
+    console.log("🚀 Serverless function invoked");
     await ensureDb();
     // Express app is a request handler — call it directly
+    console.log("✅ DB ensured");
     return app(req, res);
   } catch (err) {
     console.error('Serverless handler error:', err);
