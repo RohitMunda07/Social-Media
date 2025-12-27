@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "Src/index.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "Src/index.js" }
+  ],
+  "functions": {
+    "Src/index.js": {
+      "runtime": "nodejs18.x",
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+}

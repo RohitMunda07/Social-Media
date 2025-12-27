@@ -34,8 +34,10 @@
 
 import axios from "axios";
 
+console.log(import.meta.env.VITE_API_URL);
+
 const app = axios.create({
-  baseURL: "http://localhost:8080/api/v1/",
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: false, // ✅ allow cookies to be sent with every request
 });
 
