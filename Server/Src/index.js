@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 import connectDB from '../DataBase/index.js';
 import { app } from './app.js';
 
-dotenv.config({ path: './env' }); // optional locally; Vercel uses process.env
 
 /**
  * Ensure DB is connected and reuse connection across invocations.
