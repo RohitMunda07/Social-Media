@@ -3,10 +3,8 @@
 // export default handler;
 
 
+import { app } from "../Server/src/app.js";
+
 export default function handler(req, res) {
-  res.status(200).json({
-    ok: true,
-    message: "Serverless entry working",
-    node: process.version
-  });
+  return app(req, res);
 }
