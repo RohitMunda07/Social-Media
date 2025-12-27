@@ -8,9 +8,8 @@ import { app } from './app.js'
 import { setupSocket } from './socket.js'
 import http from "http"
 
-dotenv.config({
-    path: './env'
-})
+// Load environment variables from the default .env file
+dotenv.config()
 
 connectDB()
     .then(() => {
