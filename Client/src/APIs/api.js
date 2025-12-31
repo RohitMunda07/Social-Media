@@ -22,6 +22,7 @@ export const googleAuth = (code) => {
 };
 
 export const post = async (route, formData = {}, options = {}) => {
+  // console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
   return await app.post(route, formData, {
     ...options,
     // withCredentials: true, // ✅ ensure cookies for POST
