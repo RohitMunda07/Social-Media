@@ -14,7 +14,10 @@ import messageRouter from "../Routes/message.router.js"
 const app = express();
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: [
+        process.env.CORS_ORIGIN,
+        "https://your-frontend-name.vercel.app"
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'], // ⬅️ MUST INCLUDE AUTHORIZATION
