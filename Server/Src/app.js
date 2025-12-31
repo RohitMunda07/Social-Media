@@ -16,7 +16,7 @@ const app = express();
 app.use(cors({
     origin: [
         process.env.CORS_ORIGIN,
-        "https://your-frontend-name.vercel.app"
+        "https://social-media-tyho.onrender.com"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
